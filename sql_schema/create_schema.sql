@@ -11,13 +11,13 @@ CREATE TABLE documento (
 );
 
 CREATE TABLE login (
-id_login int NOT NULL AUTO_INCREMENT,
-id_user int,
-salt varchar(255) NOT NULL,
-hash_senha varchar(255) NOT NULL,
+    id_login int NOT NULL AUTO_INCREMENT,
+    id_user int,
+    salt varchar(255) NOT NULL,
+    hash_senha varchar(255) NOT NULL,
 
-FOREIGN KEY (id_user) REFERENCES documento(id),
-PRIMARY KEY (id_login)
+    FOREIGN KEY (id_user) REFERENCES documento(id),
+    PRIMARY KEY (id_login)
 );
 
 CREATE TABLE tipo_registro (
