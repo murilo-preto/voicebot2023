@@ -9,6 +9,33 @@
     <main>
       <div class="jumbotron">
         <h1>Agente conversacional para telemonitoramento de pacientes</h1>
+        <p id="conteudo-dinamico">
+          Este conteúdo será atualizado dinamicamente.
+        </p>
+
+        \
+        <script>
+          var apiUrl = "http://127.0.0.1:5000/api/pi";
+
+          fetch(apiUrl)
+            .then((response) => {
+              // Verifica se a resposta da solicitação foi bem-sucedida (código de status 200)
+              if (!response.ok) {
+                throw new Error("Erro na solicitação");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              // Atualiza dinamicamente o conteúdo da página com os dados recebidos
+              document.getElementById("conteudo-dinamico").innerText =
+                "Dados recebidos: " + JSON.stringify(data);
+            })
+            .catch((error) => {
+              // Manipula erros durante a solicitação
+              console.error("Erro na solicitação:", error);
+            });
+        </script>
+
         <p>Projeto de Iniciação científica.</p>
       </div>
     </main>
