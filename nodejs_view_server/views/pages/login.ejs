@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body class="container">
+    <header><%- include('../partials/header'); %></header>
+
+    <main>
+      <div class="jumbotron">
+        <h1>Login</h1>
+
+        <p>
+          Digite as suas crendenciais para acessar as funcionalidades do site:
+        </p>
+
+        <form action="http://127.0.0.1:5000/api/login" method="POST">
+          <div class="container">
+            <label for="uname"><b>CPF:</b></label>
+
+            <script>
+              function mascara(i) {
+                var v = i.value;
+
+                if (isNaN(v[v.length - 1])) {
+                  // impede entrar outro caractere que não seja número
+                  i.value = v.substring(0, v.length - 1);
+                  return;
+                }
+
+                i.setAttribute("maxlength", "14");
+                if (v.length == 3 || v.length == 7) i.value += ".";
+                if (v.length == 11) i.value += "-";
+              }
+            </script>
+
+            <input
+              oninput="mascara(this)"
+              type="text"
+              placeholder="123.456.789-12"
+              name="uname"
+              required
+            />
+
+            <br />
+
+            <label for="psw"><b>Senha:</b></label>
+            <input
+              type="password"
+              id="pwd"
+              placeholder="Digite a sua senha"
+              name="psw"
+              pattern=".{8,}"
+              required
+            />
+
+            <br />
+
+            <button type="submit">Login</button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <footer><%- include('../partials/footer'); %></footer>
+  </body>
+</html>
