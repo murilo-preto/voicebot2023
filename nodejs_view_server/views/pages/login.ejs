@@ -14,10 +14,9 @@
           Digite as suas crendenciais para acessar as funcionalidades do site:
         </p>
 
-        <form action="http://127.0.0.1:5000/api/login" method="POST">
+        <!-- <form action="http://127.0.0.1:5000/api/login" method="POST"> -->
+        <form action="http://127.0.0.1:3000/login" method="POST">
           <div class="container">
-            <label for="uname"><b>CPF:</b></label>
-
             <script>
               function mascara(i) {
                 var v = i.value;
@@ -34,6 +33,7 @@
               }
             </script>
 
+            <label for="uname"><b>CPF:</b></label>
             <input
               oninput="mascara(this)"
               type="text"
