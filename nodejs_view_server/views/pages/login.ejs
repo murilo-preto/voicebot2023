@@ -1,67 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <%- include('../partials/head'); %>
-  </head>
-  <body class="container">
-    <header><%- include('../partials/header'); %></header>
+</head>
+<body class="container">
+    <header>
+        <%- include('../partials/header'); %>
+    </header>
 
     <main>
-      <div class="jumbotron">
-        <h1>Login</h1>
+        <div class="jumbotron">
+            <h1>Login</h1>
+            <p>Digite as suas credenciais para acessar as funcionalidades do site:</p>
 
-        <p>
-          Digite as suas crendenciais para acessar as funcionalidades do site:
-        </p>
+            <form id="login-form" action="http://127.0.0.1:3000/login" method="POST">
+                <div class="container">
+                    <script>
+                        function applyCpfMask(input) {
+                            var value = input.value;
 
-        <!-- <form action="http://127.0.0.1:5000/api/login" method="POST"> -->
-        <form action="http://127.0.0.1:3000/login" method="POST">
-          <div class="container">
-            <script>
-              function mascara(i) {
-                var v = i.value;
+                            if (isNaN(value[value.length - 1])) {
+                                input.value = value.substring(0, value.length - 1);
+                                return;
+                            }
 
-                if (isNaN(v[v.length - 1])) {
-                  // impede entrar outro caractere que não seja número
-                  i.value = v.substring(0, v.length - 1);
-                  return;
-                }
+                            input.setAttribute("maxlength", "14");
+                            if (value.length === 3 || value.length === 7) input.value += ".";
+                            if (value.length === 11) input.value += "-";
+                        }
 
-                i.setAttribute("maxlength", "14");
-                if (v.length == 3 || v.length == 7) i.value += ".";
-                if (v.length == 11) i.value += "-";
-              }
-            </script>
+                        async function submitForm() {
+                            const form = document.getElementById('login-form');
+                            const formData = new URLSearchParams(new FormData(form));
 
-            <label for="uname"><b>CPF:</b></label>
-            <input
-              oninput="mascara(this)"
-              type="text"
-              placeholder="123.456.789-12"
-              name="uname"
-              required
-            />
+                            try {
+                                const response = await fetch('http://127.0.0.1:3000/login', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                    },
+                                    body: formData,
+                                });
 
-            <br />
+                                if (!response.ok) {
+                                    throw new Error('Authentication failed');
+                                }
 
-            <label for="psw"><b>Senha:</b></label>
-            <input
-              type="password"
-              id="pwd"
-              placeholder="Digite a sua senha"
-              name="psw"
-              pattern=".{8,}"
-              required
-            />
+                                const data = await response.json();
+                                const accessToken = data.access_token;
+                                console.log('Received JWT token:', accessToken);
 
-            <br />
+                                // Store the JWT token in localStorage or cookies as needed
+                                localStorage.setItem('accessToken', accessToken);
 
-            <button type="submit">Login</button>
-          </div>
-        </form>
-      </div>
+                                window.location.href = '/';
+                            } catch (error) {
+                                console.error('Error:', error.message);
+                            }
+                        }
+                    </script>
+
+                    <label for="uname"><b>CPF:</b></label>
+                    <input oninput="applyCpfMask(this)" type="text" placeholder="xxx.xxx.xxx-xx" name="uname" required />
+
+                    <br />
+
+                    <label for="psw"><b>Senha:</b></label>
+                    <input type="password" id="pwd" placeholder="Digite a sua senha" name="psw" pattern=".{8,}" required />
+
+                    <br />
+
+                    <button type="button" onclick="submitForm()">Login</button>
+                </div>
+            </form>
+        </div>
     </main>
 
-    <footer><%- include('../partials/footer'); %></footer>
-  </body>
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+</body>
 </html>
