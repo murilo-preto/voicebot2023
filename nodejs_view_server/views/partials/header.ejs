@@ -1,11 +1,49 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">Navegação</a>
-    <ul class="navbar-nav mr-auto">
+  <a class="navbar-brand" href="/">Navegação</a>
+  <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link" href="/">Home</a>
+          <a class="nav-link" href="/">Home</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/login">Login</a>
+          <a class="nav-link" href="/login">Login</a>
       </li>
-    </ul>
-  </nav>
+  </ul>
+</nav>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const accessToken = localStorage.getItem('accessToken');
+
+      if (accessToken) {
+          const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
+          const username = tokenPayload.sub;
+
+          console.log('User is logged in as:', username);
+
+          // Create a container for the username
+          const usernameContainer = document.createElement('span');
+          usernameContainer.textContent = `Bem vindo, ${username}`;
+          usernameContainer.classList.add('navbar-text', 'mr-2'); // Add Bootstrap classes
+
+          // Create the logout button
+          const logoutButton = document.createElement('button');
+          logoutButton.textContent = 'Desconectar';
+          logoutButton.classList.add('btn', 'btn-outline-secondary'); // Optional: Add Bootstrap classes
+          logoutButton.addEventListener('click', function () {
+              // Remove the access token from localStorage
+              localStorage.removeItem('accessToken');
+              console.log('User logged out');
+              window.location.href = '/login'; // Redirect to the login page or another appropriate URL
+          });
+
+          // Find the navbar and append the username and logout button to it
+          const navbar = document.querySelector('.navbar');
+          if (navbar) {
+              navbar.appendChild(usernameContainer);
+              navbar.appendChild(logoutButton);
+          }
+      } else {
+          console.log('User is not logged in');
+      }
+  });
+</script>
