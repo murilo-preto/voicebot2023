@@ -15,16 +15,17 @@ def get_pi():
 # Rota post para lidar com Login
 @app.route('/api/login', methods=['POST'])
 def login():
-    json_data = request.get_json()
-    uname = json_data.get('uname')
-    psw = json_data.get('psw')
+    if request.form:
+        data = request.form.to_dict()
+        uname = data["username"]
+        psw = data["password"]
+        print(f'{uname}:{psw}')
 
-    print(f'{uname}:{psw}')
-    if uname!=None: #Credentials OK
-        access_token = create_access_token(identity=uname)
-        return jsonify(access_token=access_token), 200
+        if uname!=None:
+            access_token = create_access_token(identity=uname)
+            return jsonify(access_token=access_token), 200
     else:
-        return jsonify(message='Invalid credentials'), 401
+        return jsonify(message='Empty request form'), 401 
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000)
