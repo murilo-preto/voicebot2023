@@ -1,103 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <%- include('../partials/head'); %>
-  </head>
-  <body class="container">
-    <header><%- include('../partials/header'); %></header>
 
-    <main>
-      <div class="jumbotron">
-        <h1>Login</h1>
-        <p>
-          Digite as suas credenciais para acessar as funcionalidades do site:
-        </p>
+<head>
+  <%- include('../partials/head'); %>
+</head>
 
-        <form
-          id="login-form"
-          action="http://127.0.0.1:5000/api/login"
-          method="POST"
-        >
-          <div class="container">
-            <script>
-              function applyCpfMask(input) {
-                var value = input.value;
+<body class="container">
+  <header><%- include('../partials/header'); %></header>
 
-                if (isNaN(value[value.length - 1])) {
-                  input.value = value.substring(0, value.length - 1);
-                  return;
-                }
+  <main>
+    <div class="jumbotron">
+      <h1>Login</h1>
+      <p>
+        Digite as suas credenciais para acessar as funcionalidades do site:
+      </p>
 
-                input.setAttribute("maxlength", "14");
-                if (value.length === 3 || value.length === 7)
-                  input.value += ".";
-                if (value.length === 11) input.value += "-";
+      <form id="login-form" action="http://127.0.0.1:5000/api/login" method="POST">
+        <div class="container">
+          <script>
+            function applyCpfMask(input) {
+              var value = input.value;
+
+              if (isNaN(value[value.length - 1])) {
+                input.value = value.substring(0, value.length - 1);
+                return;
               }
 
-              async function submitForm() {
-                const form = document.getElementById("login-form");
-                const formData = new URLSearchParams(new FormData(form));
+              input.setAttribute("maxlength", "14");
+              if (value.length === 3 || value.length === 7)
+                input.value += ".";
+              if (value.length === 11) input.value += "-";
+            }
 
-                try {
-                  const response = await fetch(
-                    "http://127.0.0.1:5000/api/login",
-                    {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                      },
-                      body: formData,
-                    }
-                  );
+            async function submitForm() {
+              const form = document.getElementById("login-form");
+              const formData = new URLSearchParams(new FormData(form));
 
-                  if (!response.ok) {
-                    throw new Error("Authentication failed");
+              try {
+                const response = await fetch(
+                  "http://127.0.0.1:5000/api/login",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: formData,
                   }
+                );
 
-                  const data = await response.json();
-                  const accessToken = data.access_token;
-                  console.log("Received JWT token:", accessToken);
-
-                  // Store the JWT token in localStorage or cookies as needed
-                  localStorage.setItem("accessToken", accessToken);
-
-                  window.location.href = "/";
-                } catch (error) {
-                  console.error("Error:", error.message);
+                if (!response.ok) {
+                  throw new Error("Authentication failed");
                 }
+
+                const data = await response.json();
+                const accessToken = data.access_token;
+                console.log("Received JWT token:", accessToken);
+
+                // Store the JWT token in localStorage or cookies as needed
+                localStorage.setItem("accessToken", accessToken);
+
+                window.location.href = "/";
+              } catch (error) {
+                console.error("Error:", error.message);
               }
-            </script>
+            }
+          </script>
 
-            <label for="username"><b>CPF:</b></label>
-            <input
-              oninput="applyCpfMask(this)"
-              type="text"
-              id="username"
-              placeholder="xxx.xxx.xxx-xx"
-              name="username"
-              required
-            />
+          <label for="username"><b>CPF:</b></label>
+          <input oninput="applyCpfMask(this)" type="text" id="username" placeholder="xxx.xxx.xxx-xx" name="username"
+            required />
 
-            <br />
+          <br />
 
-            <label for="password"><b>Senha:</b></label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Digite a sua senha"
-              name="password"
-              pattern=".{8,}"
-              required
-            />
+          <label for="password"><b>Senha:</b></label>
+          <input type="password" id="password" placeholder="Digite a sua senha" name="password" pattern=".{8,}"
+            required />
 
-            <br />
+          <br />
 
-            <button type="button" onclick="submitForm()">Login</button>
-          </div>
-        </form>
-      </div>
-    </main>
+          <button type="button" onclick="submitForm()">Login</button>
+        </div>
+      </form>
+    </div>
+  </main>
 
-    <footer><%- include('../partials/footer'); %></footer>
-  </body>
+  <footer><%- include('../partials/footer'); %></footer>
+</body>
+
 </html>
