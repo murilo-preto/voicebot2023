@@ -1,28 +1,33 @@
 import express from "express";
-import axios from "axios";
 import jwt from "jsonwebtoken";
 import cors from 'cors';
 
 const app = express();
 const port = process.env.PORT || 3000;
+const secretKey = '12345';
 
+// Middleware to enable Cross-Origin Resource Sharing (CORS)
 app.use(cors());
+
+// Set the view engine and configure middleware for parsing requests
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-const secretKey = 'your-secret-key';
+app.use(express.static('public'))
 
 // Middleware to authenticate JWT
 const authenticateJWT = (req, res, next) => {
-  const token = req.header('Authorization');
+  const tokenHeader = req.header('Authorization');
 
-  if (!token) {
+  if (!tokenHeader) {
     return res.status(401).send('Unauthorized. Please provide a valid token.');
   }
 
-  jwt.verify(token, secretKey, (err, user) => {
+  const token = tokenHeader.split(' ')[1]; // Assuming the format is 'Bearer <token>'
+
+  jwt.verify(token, secretKey, { algorithms: ['HS256'] }, (err, user) => {
     if (err) {
+      console.error(err);
       return res.status(403).send('Token verification failed.');
     }
 
@@ -31,50 +36,20 @@ const authenticateJWT = (req, res, next) => {
   });
 };
 
-// Homepage route
+// Define routes
 app.get("/", (req, res) => {
   res.render("pages/index");
 });
 
-// Login page route
 app.get("/login", (req, res) => {
   res.render("pages/login");
 });
 
-// Login route handling
-app.post("/login", async (req, res) => {
-  try {
-    const { uname, psw } = req.body;
-    const postData = { uname, psw };
-
-    // console.log(req.body.uname);
-    // const postData = req.body;
-    const url = 'http://127.0.0.1:5000/api/login';
-
-    // Making axios request to external API for login
-    const response = await axios.post(url, postData);
-
-    // Check for invalid credentials
-    if (response.status === 401) {
-      return res.status(401).send("Invalid credentials");
-    }
-
-    // Extracting access token from the response and sending it in the JSON response
-    const accessToken = response.data.access_token;
-    res.json({ access_token: accessToken });
-  } catch (error) {
-    // Handling unexpected errors
-    console.error('Error:', error.message);
-    res.status(500).send('Internal Server Error');
-  }
+app.get("/voicebot", authenticateJWT, (req, res) => {
+  res.render("pages/voicebot");
 });
 
-// Protected route requiring JWT authentication
-app.get('/protected-route', authenticateJWT, (req, res) => {
-  res.send(`Welcome, ${req.user.username}!`);
-});
-
-// Server listening on specified port
+// Start the server
 app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });

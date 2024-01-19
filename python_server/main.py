@@ -3,14 +3,9 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from flask_cors import CORS
 
 app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = 'your-secret-key'
+app.config['JWT_SECRET_KEY'] = '12345'
 jwt = JWTManager(app)
 CORS(app)
-
-# Teste para GET
-@app.route('/api/pi')
-def get_pi():
-    return {'usuario': 'murilo'}
 
 # Rota post para lidar com Login
 @app.route('/api/login', methods=['POST'])
