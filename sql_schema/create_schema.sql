@@ -1,41 +1,43 @@
 USE voicebot;
 
 CREATE TABLE documento (
-    id int NOT NULL AUTO_INCREMENT,
-    cpf int NOT NULL,
-    primeiro_nome varchar(255) NOT NULL,
-    ultimo_nome varchar(255) NOT NULL,
-    data_nascimento date NOT NULL,
-    cargo varchar(255),
-    PRIMARY KEY (id)
+    id INT NOT NULL AUTO_INCREMENT,
+    cpf VARCHAR(14) NOT NULL,
+    primeiro_nome VARCHAR(255) NOT NULL,
+    ultimo_nome VARCHAR(255) NOT NULL,
+    data_nascimento DATE NOT NULL,
+    cargo VARCHAR(255),
+    PRIMARY KEY (id),
+    INDEX idx_cpf (cpf)
 );
 
 CREATE TABLE login (
-    id_login int NOT NULL AUTO_INCREMENT,
-    id_user int NOT NULL,
-    salt varchar(255) NOT NULL,
-    hash_senha varchar(255) NOT NULL,
-
-    FOREIGN KEY (id_user) REFERENCES documento(id),
-    PRIMARY KEY (id_login)
+    id_login INT NOT NULL AUTO_INCREMENT,
+    id_documento INT NOT NULL,
+    salt VARCHAR(255) NOT NULL,
+    hash_senha VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id_login),
+    INDEX idx_id_documento (id_documento),
+    FOREIGN KEY (id_documento) REFERENCES documento(id) ON DELETE CASCADE
 );
 
 CREATE TABLE tipo_registro (
-	id_tipo_registro int NOT NULL AUTO_INCREMENT,
-	tipo varchar(255) NOT NULL,
-	PRIMARY KEY (id_tipo_registro)
+    id_tipo_registro INT NOT NULL AUTO_INCREMENT,
+    tipo VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id_tipo_registro)
 );
 
 CREATE TABLE registro (
-	id_registro int NOT NULL AUTO_INCREMENT,
-    data_hora datetime DEFAULT(current_timestamp()),
-    id_user int,
-    tipo int,
-    valor varchar(255),
-
-	PRIMARY KEY (id_registro),
-    FOREIGN KEY (id_user) REFERENCES documento(id),
-    FOREIGN KEY (tipo) REFERENCES tipo_registro(id_tipo_registro)
+    id_registro INT NOT NULL AUTO_INCREMENT,
+    data_hora DATETIME DEFAULT CURRENT_TIMESTAMP,
+    id_documento INT,
+    tipo_registro INT,
+    valor VARCHAR(255),
+    PRIMARY KEY (id_registro),
+    INDEX idx_id_documento (id_documento),
+    INDEX idx_tipo_registro (tipo_registro),
+    FOREIGN KEY (id_documento) REFERENCES documento(id) ON DELETE CASCADE,
+    FOREIGN KEY (tipo_registro) REFERENCES tipo_registro(id_tipo_registro) ON DELETE CASCADE
 );
 
-SHOW tables;
+SHOW TABLES;
