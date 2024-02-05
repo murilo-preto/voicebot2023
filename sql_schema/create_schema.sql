@@ -6,13 +6,13 @@ CREATE TABLE documento (
     primeiro_nome varchar(255) NOT NULL,
     ultimo_nome varchar(255) NOT NULL,
     data_nascimento date NOT NULL,
-    categoria varchar(255),
+    cargo varchar(255),
     PRIMARY KEY (id)
 );
 
 CREATE TABLE login (
     id_login int NOT NULL AUTO_INCREMENT,
-    id_user int,
+    id_user int NOT NULL,
     salt varchar(255) NOT NULL,
     hash_senha varchar(255) NOT NULL,
 
