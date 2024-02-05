@@ -2,7 +2,7 @@ USE voicebot;
 
 CREATE TABLE documento (
     id INT NOT NULL AUTO_INCREMENT,
-    cpf VARCHAR(14) NOT NULL,
+    cpf VARCHAR(14) NOT NULL UNIQUE,
     primeiro_nome VARCHAR(255) NOT NULL,
     ultimo_nome VARCHAR(255) NOT NULL,
     data_nascimento DATE NOT NULL,
