@@ -44,7 +44,7 @@ def test_inserir_usuario():
         'primeiro_nome': 'João',
         'ultimo_nome': 'Silva',
         'data_nascimento': '1990-01-01',
-        'cargo': 'Analista'
+        'cargo': 'Paciente'
     }
     success, message = inserir_usuario(data_teste_1)
     print(success, message)
