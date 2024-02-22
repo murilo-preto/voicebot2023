@@ -5,48 +5,85 @@ config = {
     'password': 'password',
     'host': 'localhost',
     'database': 'voicebot',
-    'port': '3306'  # Porta padrão do MySQL
+    'port': '3306'
 }
+
+def inserir_cargo(cargo):
+    try:
+        with mysql.connector.connect(**config) as conn, conn.cursor() as cursor:
+            cursor.execute("INSERT INTO cargo (cargo) SELECT %s WHERE NOT EXISTS (SELECT 1 FROM cargo WHERE cargo = %s)", (cargo, cargo))
+            conn.commit()
+            print(f"Cargo '{cargo}' inserido com sucesso.")
+    except mysql.connector.Error as e:
+        print(f"Erro ao inserir cargo: {e}")
 
 def inserir_usuario(data):
     try:
-        # Conexão com o banco de dados
-        conn = mysql.connector.connect(**config)
-        cursor = conn.cursor()
+        with mysql.connector.connect(**config) as conn, conn.cursor() as cursor:
+            cursor.execute("SELECT id_cargo FROM cargo WHERE cargo = %s", (data['cargo'],))
+            cargo_id = cursor.fetchone()
 
-        # Inserção de um novo usuário na tabela 'documento'
-        sql = "INSERT INTO documento (cpf, primeiro_nome, ultimo_nome, data_nascimento, cargo) VALUES (%s, %s, %s, %s, %s)"
-        val = (data['cpf'], data['primeiro_nome'], data['ultimo_nome'], data['data_nascimento'], data.get('cargo'))
-        cursor.execute(sql, val)
-
-        # Commit da transação
-        conn.commit()
-
-        # Fechar cursor e conexão
-        cursor.close()
-        conn.close()
-
-        return True, 'Usuário adicionado com sucesso!'
-    except mysql.connector.Error as e:
-        error_message = f'Erro ao adicionar usuário: {str(e)}'
-        return False, error_message
-    except KeyError as e:
-        error_message = f'Erro nos dados do usuário: {str(e)}'
-        return False, error_message
-    except Exception as e:
-        error_message = f'Erro desconhecido: {str(e)}'
-        return False, error_message
+            if cargo_id:
+                cargo_id = cargo_id[0]
+                sql = "INSERT INTO documento (cpf, primeiro_nome, ultimo_nome, data_nascimento, cargo) VALUES (%s, %s, %s, %s, %s)"
+                val = (data['cpf'], data['primeiro_nome'], data['ultimo_nome'], data['data_nascimento'], cargo_id)
+                cursor.execute(sql, val)
+                conn.commit()
+                return True, 'Usuário adicionado com sucesso!'
+            else:
+                return False, f"Cargo '{data['cargo']}' não encontrado na tabela 'cargo'."
+    except (mysql.connector.Error, KeyError) as e:
+        return False, f'Erro: {e}'
 
 def test_inserir_usuario():
-    # Caso de teste 1: Inserção bem-sucedida de um novo usuário
     data_teste_1 = {
         'cpf': '12345678900',
         'primeiro_nome': 'João',
         'ultimo_nome': 'Silva',
         'data_nascimento': '1990-01-01',
-        'cargo': 'Paciente'
+        'cargo': 'paciente'
     }
-    success, message = inserir_usuario(data_teste_1)
+
+    data_teste_2= {
+        'cpf': '34567890155',
+        'primeiro_nome': 'Álvaro',
+        'ultimo_nome': 'Torres',
+        'data_nascimento': '1970-09-25',
+        'cargo': 'medico'
+    }
+
+    success, message = inserir_usuario(data_teste_2)
     print(success, message)
 
-test_inserir_usuario()
+def test_inserir_usuario_interativo():
+    print("Teste de inserção de usuários - Modo Interativo\n")
+
+    while True:
+        print("Por favor, insira os dados do novo usuário:")
+        cpf = input("CPF: ")
+        primeiro_nome = input("Primeiro Nome: ")
+        ultimo_nome = input("Último Nome: ")
+        data_nascimento = input("Data de Nascimento (AAAA-MM-DD): ")
+        cargo = input("Cargo: ")
+
+        novo_usuario = {
+            'cpf': cpf,
+            'primeiro_nome': primeiro_nome,
+            'ultimo_nome': ultimo_nome,
+            'data_nascimento': data_nascimento,
+            'cargo': cargo
+        }
+
+        success, message = inserir_usuario(novo_usuario)
+
+        if success:
+            print(f"\nUsuário adicionado com sucesso: {message}\n")
+        else:
+            print(f"\nFalha ao adicionar usuário: {message}\n")
+
+        opcao = input("Deseja inserir outro usuário? (s/n): ")
+        if opcao.lower() != 's':
+            print("Encerrando o teste de inserção de usuários.")
+            break
+
+test_inserir_usuario_interativo()

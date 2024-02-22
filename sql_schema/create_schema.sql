@@ -1,13 +1,20 @@
 USE voicebot;
 
+CREATE TABLE cargo (
+    id_cargo INT NOT NULL AUTO_INCREMENT,
+    cargo VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id_cargo)
+);
+
 CREATE TABLE documento (
     id INT NOT NULL AUTO_INCREMENT,
     cpf VARCHAR(14) NOT NULL UNIQUE,
     primeiro_nome VARCHAR(255) NOT NULL,
     ultimo_nome VARCHAR(255) NOT NULL,
     data_nascimento DATE NOT NULL,
-    cargo VARCHAR(255),
+    cargo INT NOT NULL,
     PRIMARY KEY (id),
+    FOREIGN KEY (cargo) REFERENCES cargo(id_cargo),
     INDEX idx_cpf (cpf)
 );
 
