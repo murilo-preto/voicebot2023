@@ -1,4 +1,5 @@
 import mysql.connector
+import re
 
 config = {
     'user': 'root',
@@ -7,6 +8,24 @@ config = {
     'database': 'voicebot',
     'port': '3306'
 }
+
+def filtrar_entrada(entrada):
+    padrao = re.compile(r'[^a-zA-Z0-9À-ú]')
+
+    if isinstance(entrada, str):
+        return padrao.sub('', entrada)
+    elif isinstance(entrada, dict):
+        entrada_filtrada = {}
+        for chave, valor in entrada.items():
+            if isinstance(valor, str):
+                valor_filtrado = padrao.sub('', valor)
+                entrada_filtrada[chave] = valor_filtrado
+            else:
+                entrada_filtrada[chave] = valor
+        return entrada_filtrada
+    else:
+        raise TypeError("Tipo de entrada recusado")
+
 
 def inserir_cargo(cargo):
     try:
