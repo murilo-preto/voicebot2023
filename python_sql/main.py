@@ -9,6 +9,7 @@ config = {
     'port': '3306'
 }
 
+
 def filtrar_entrada(entrada):
     padrao = re.compile(r'[^a-zA-Z0-9À-ú]')
 
@@ -36,6 +37,7 @@ def inserir_cargo(cargo):
     except mysql.connector.Error as e:
         print(f"Erro ao inserir cargo: {e}")
 
+
 def inserir_usuario(data):
     try:
         with mysql.connector.connect(**config) as conn, conn.cursor() as cursor:
@@ -53,6 +55,31 @@ def inserir_usuario(data):
                 return False, f"Cargo '{data['cargo']}' não encontrado na tabela 'cargo'."
     except (mysql.connector.Error, KeyError) as e:
         return False, f'Erro: {e}'
+    
+
+def inserir_login(cpf, senha):
+    try:
+        with mysql.connector.connect(**config) as conn, conn.cursor() as cursor:
+            cursor.execute("SELECT id FROM documento WHERE cpf = %s", (cpf,))
+            id_documento = cursor.fetchone()
+
+            if id_documento:
+                id_documento = id_documento[0]
+
+                query_login = """
+                    INSERT INTO login (id_documento, salt, hash_senha)
+                    VALUES (%s, UUID(), SHA2(CONCAT(%s, UUID()), 256))
+                """
+                dados_login = (id_documento, senha)
+
+                cursor.execute(query_login, dados_login)
+                conn.commit()
+                return True, 'Login inserido com sucesso!'
+            else:
+                return False, f"Documento com CPF '{cpf}' não encontrado."
+    except mysql.connector.Error as e:
+        return False, f'Erro ao inserir login: {e}'
+
 
 def test_inserir_usuario():
     data_teste_1 = {
@@ -73,6 +100,7 @@ def test_inserir_usuario():
 
     success, message = inserir_usuario(data_teste_2)
     print(success, message)
+
 
 def test_inserir_usuario_interativo():
     print("Teste de inserção de usuários - Modo Interativo\n")
@@ -105,4 +133,5 @@ def test_inserir_usuario_interativo():
             print("Encerrando o teste de inserção de usuários.")
             break
 
-test_inserir_usuario_interativo()
+
+inserir_login(cpf='44455566612', senha='senha1234')
