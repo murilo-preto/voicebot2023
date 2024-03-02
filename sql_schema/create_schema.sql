@@ -2,7 +2,7 @@ USE voicebot;
 
 CREATE TABLE cargo (
     id_cargo INT NOT NULL AUTO_INCREMENT,
-    cargo VARCHAR(255) NOT NULL,
+    cargo VARCHAR(255) NOT NULL UNIQUE,
     PRIMARY KEY (id_cargo)
 );
 
