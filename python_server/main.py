@@ -21,6 +21,16 @@ def login():
             return jsonify(access_token=access_token), 200
     else:
         return jsonify(message='Empty request form'), 401 
+    
+@app.route('/api/upload-audio', methods=['POST'])
+def upload_audio():
+    if 'audio' not in request.files:
+        return 'Nenhum arquivo de áudio enviado', 400
+
+    audio_file = request.files['audio']
+    audio_file.save('audio_received.wav')  # Salva o arquivo de áudio no servidor
+
+    return 'Áudio recebido com sucesso', 200
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000)
