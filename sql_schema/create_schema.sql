@@ -47,4 +47,27 @@ CREATE TABLE registro (
     FOREIGN KEY (tipo_registro) REFERENCES tipo_registro(id_tipo_registro) ON DELETE CASCADE
 );
 
+DELIMITER //
+CREATE FUNCTION validar_login(p_id_documento INT, p_senha VARCHAR(255)) RETURNS BOOLEAN
+READS SQL DATA
+BEGIN
+    DECLARE v_salt VARCHAR(255);
+    DECLARE v_hash_senha VARCHAR(255);
+    DECLARE v_hash_input VARCHAR(255);
+
+    SELECT salt, hash_senha INTO v_salt, v_hash_senha
+    FROM login
+    WHERE id_documento = p_id_documento;
+
+    SET v_hash_input = SHA2(CONCAT(p_senha, v_salt), 256);
+
+    IF v_hash_input = v_hash_senha THEN
+        RETURN TRUE;
+    ELSE
+        RETURN FALSE;
+    END IF;
+END //
+DELIMITER ;
+
+
 SHOW TABLES;
