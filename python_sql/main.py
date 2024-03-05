@@ -60,27 +60,11 @@ def inserir_usuario(data):
 def inserir_login(cpf, senha):
     try:
         with mysql.connector.connect(**config) as conn, conn.cursor() as cursor:
-            cursor.execute("SELECT id FROM documento WHERE cpf = %s", (cpf,))
-            id_documento = cursor.fetchone()[0]
+            cursor.callproc('inserir_login', (cpf, senha))
 
-            if id_documento:
-                query_salt = 'INSERT INTO login (id_documento, salt, hash_senha) VALUES (%s, UUID(), "placeholder")'
-                cursor.execute(query_salt, (id_documento,))
-                conn.commit()
-
-                cursor.execute("SELECT salt FROM login WHERE id_documento = %s", (id_documento,))
-                salt = cursor.fetchone()[0]
-
-                query_senha =  """
-                    UPDATE login
-                    SET hash_senha = SHA2(CONCAT(%s, %s), 256)
-                    WHERE id_documento = %s;
-                """
-                cursor.execute(query_senha, (senha, salt, id_documento))  # Fix the order of parameters
-                conn.commit()
-                print('Login inserido com sucesso!')
-            else:
-                print(f"Documento com CPF '{cpf}' não encontrado.")
+            for result in cursor.stored_results():
+                message = result.fetchone()[0]
+                print(message)
     except mysql.connector.Error as e:
         print(f'Erro ao inserir login: {e}')
 
@@ -158,6 +142,6 @@ def test_inserir_usuario_interativo():
 # inserir_cargo('medico')
 # inserir_cargo('paciente')
 # test_inserir_usuario()
-# inserir_login(cpf='12345678900', senha='senha12345')
-# status = validar_login(cpf='12345678900', senha='senha12345')
+# inserir_login(cpf='34567890155', senha='123')
+# status = validar_login(cpf='34567890155', senha='123')
 # print(status)

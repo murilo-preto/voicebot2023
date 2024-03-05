@@ -48,6 +48,41 @@ CREATE TABLE registro (
 );
 
 DELIMITER //
+CREATE PROCEDURE inserir_login(IN p_cpf VARCHAR(15), IN p_senha VARCHAR(255))
+BEGIN
+    DECLARE v_id_documento INT;
+    DECLARE v_salt VARCHAR(255);
+    DECLARE error_occurred INT DEFAULT 0;
+
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+    BEGIN
+        SET error_occurred = 1;
+        ROLLBACK;
+    END;
+
+    START TRANSACTION;
+
+    SELECT id INTO v_id_documento FROM documento WHERE cpf = p_cpf;
+
+    IF v_id_documento IS NOT NULL THEN
+        SET v_salt = UUID();
+
+        INSERT INTO login (id_documento, salt, hash_senha)
+        VALUES (v_id_documento, v_salt, SHA2(CONCAT(p_senha, v_salt), 256));
+
+        IF error_occurred = 0 THEN
+            COMMIT;
+            SELECT 'Login inserido com sucesso!' AS message;
+        ELSE
+            SELECT 'Erro ao inserir login.' AS message;
+        END IF;
+    ELSE
+        SELECT CONCAT('Documento com CPF ', p_cpf, ' não encontrado.') AS message;
+    END IF;
+END //
+DELIMITER ;
+
+DELIMITER //
 CREATE FUNCTION validar_login(p_id_documento INT, p_senha VARCHAR(255)) RETURNS BOOLEAN
 READS SQL DATA
 BEGIN
