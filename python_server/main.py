@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from flask_cors import CORS
 
+from public.python.webm2wav import webm2wav
 from public.python.speechToText import recognize_speech
 
 app = Flask(__name__)
@@ -30,8 +31,11 @@ def upload_audio():
         return 'Nenhum arquivo de áudio enviado', 400
 
     audio_file = request.files['audio']
-    audio_file.save('python_server/temp/audio.wav')
+    audio_file.save('python_server/temp/audio.webm')
 
+    webm2wav('python_server/temp/audio.webm', 'python_server/temp/audio.wav')
+    text = recognize_speech('python_server/temp/audio.wav')
+    print(text)
 
     return 'Áudio recebido com sucesso', 200
 

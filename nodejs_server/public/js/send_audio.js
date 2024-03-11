@@ -5,7 +5,7 @@ function startRecording() {
     console.log("Gravando áudio");
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
-            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
             mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
             mediaRecorder.start();
         })
@@ -32,7 +32,7 @@ function stopRecording() {
 function sendAudioToServer(audioChunks) {
     console.log("Enviando gravação");
     const formData = new FormData();
-    formData.append('audio', new Blob(audioChunks, { type: 'audio/wav' }), 'audio.wav');
+    formData.append('audio', new Blob(audioChunks, { type: 'audio/webm' }));
 
     fetch('http://127.0.0.1:5000/api/upload-audio', {
         method: 'POST',
