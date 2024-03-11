@@ -14,20 +14,19 @@ function startRecording() {
 
 function stopRecording() {
     console.log("Parando gravação");
-    mediaRecorder.addEventListener('stop', () => {
-        console.log("Gravação finalizada");
-        sendAudioToServer(audioChunks);
-        audioChunks = [];
+    mediaRecorder.stop();
 
+    mediaRecorder.addEventListener('stop', () => {
         // Parar a gravação do microfone
         if (mediaRecorder.stream) {
             mediaRecorder.stream.getTracks().forEach(track => {
                 track.stop();
             });
         }
-    });
 
-    mediaRecorder.stop();
+        console.log("Gravação finalizada");
+        sendAudioToServer(audioChunks);
+    });
 }
 
 function sendAudioToServer(audioChunks) {
@@ -42,6 +41,7 @@ function sendAudioToServer(audioChunks) {
     .then(response => {
         if (response.ok) {
             console.log('Áudio enviado com sucesso.');
+            audioChunks = [];
         } else {
             console.error('Falha ao enviar áudio.');
         }
@@ -50,7 +50,5 @@ function sendAudioToServer(audioChunks) {
         console.error('Erro:', error);
     });
 }
-
-
 
 export { startRecording, stopRecording };
