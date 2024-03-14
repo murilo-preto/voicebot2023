@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from flask_cors import CORS
+import json
+import base64
 
 from public.python.webm2wav import webm2wav
 from public.python.speechToText import recognize_speech
+from public.python.textToSpeech import pyttr3_tts
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = '12345'
@@ -35,9 +38,19 @@ def upload_audio():
 
     webm2wav('python_server/temp/audio.webm', 'python_server/temp/audio.wav')
     text = recognize_speech('python_server/temp/audio.wav')
-    print(text)
+    pyttr3_tts(text, 'python_server/temp/responseAudio.mp3')
 
-    return 'Áudio recebido com sucesso', 200
+    with open('python_server/temp/responseAudio.mp3', 'rb') as audio_file:
+        audio_content = audio_file.read()
+
+    audio_base64 = base64.b64encode(audio_content).decode('utf-8')
+
+    response_data = {
+        'audio': audio_base64,
+        'text': text
+    }
+
+    return jsonify(response_data), 200
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000)
