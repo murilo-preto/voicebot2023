@@ -49,6 +49,10 @@ app.get("/voicebot", authenticateJWT, (req, res) => {
   res.render("pages/voicebot");
 });
 
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end();
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
