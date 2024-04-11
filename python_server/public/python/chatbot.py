@@ -1,3 +1,7 @@
+"""
+Alteração no Kernel.py do import aiml: time.clock -> time.time
+"""
+
 import aiml
 from timeit import default_timer as timer
 from datetime import timedelta
