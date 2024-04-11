@@ -3,28 +3,30 @@ Alteração no Kernel.py do import aiml: time.clock -> time.time
 """
 
 import aiml
-from timeit import default_timer as timer
-from datetime import timedelta
+from datetime import datetime
 
-ai = aiml.Kernel() # inicialização
-ai.learn('voicebot2.xml') # lê o arquivo principal da AIML e faz referências aos outros
+def chatbot_maria_helena(nome):
+    ai = aiml.Kernel()
+    ai.learn('voicebot2.xml')
 
-start = timer()
+    start_time = datetime.now()
 
-nome = "Roberto"
+    entrada = f"ROBOTSTART {str(nome)}"
+    response = ai.respond(entrada)
+    print("Tempo decorrido:", datetime.now() - start_time)
+    print("Maria Helena:", response)
 
-response = ai.respond(f"ROBOTSTART {nome}")
-print(timedelta(seconds=timer()-start),"Maria Helena:",response)
+    while entrada != "Até logo" and not response.startswith("SYSTEM"):
+        try:
+            entrada = input("Digite: ")
+            print("Usuário:", entrada)
 
-said = ""
+            response = ai.respond(entrada)
 
-while said != "Até logo":  
-    try:
-        said = input("Digite: ")
-        print(timedelta(seconds=timer()-start), "Usuário:",said)
-        response = ai.respond(said)     
-        
-    except:
-        response = "Desculpe, mas não consegui captar o que o que você disse..."
-    
-    print(timedelta(seconds=timer()-start)," Maria Helena:",response)
+            print("Tempo decorrido:", datetime.now() - start_time)
+            print("Maria Helena:", response)
+
+        except Exception as e:
+            print("Desculpe, ocorreu um erro:", str(e))
+
+chatbot_maria_helena(nome='Murilo')
