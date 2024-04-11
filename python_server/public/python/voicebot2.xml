@@ -1,0 +1,656 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<aiml>
+   <category>
+   	<pattern>ROBOTSTART *</pattern>
+		<template>
+			Boa tarde, eu sou a Robô Maria Helena cuidadora digital do <set name="paciente"><star /></set>. Você é o <star />?
+			<think><set name="topic">CONFIRMANOME</set><set name="numero_erro">1</set></think>
+		</template>
+   </category>
+   
+   <topic name="CONFIRMANOME">
+		<category>
+		
+			<pattern>SIM</pattern>
+			<template>
+				Estou entrando em contato em nome do Grupo de Pesquisa de Voicebot em Saúde.
+				<get name="paciente" />, o motivo da chamada é um alerta de sensor em perigo por sobrepeso que detectamos.
+				O atendimento levará alguns minutos, tudo bem? 
+				<think><set name="topic">CONFIRMADISPONIBILIDADE</set></think>
+			</template>
+		
+		</category>
+		<category>
+		
+			<pattern>* SIM</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		
+		</category>
+		<category>
+		
+			<pattern>SIM SOU EU</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+			
+		
+		</category>
+		<category>
+		
+			<pattern>* SOU EU</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+			
+		
+		</category>
+				
+
+				
+		<category>
+		
+			<pattern>NÃO</pattern>
+			<template>
+				Ok, obrigada. Até logo!
+			</template>
+		
+		</category>
+		<category>
+		
+			<pattern>NÃO SOU EU</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+			
+		
+		</category>
+			
+		<category>
+   		<pattern>ATÉ LOGO</pattern>
+			<template>Agradeço pela sua atenção e até logo.</template>
+   	</category>
+
+   </topic>
+  
+    <topic name="CONFIRMADISPONIBILIDADE">
+		<category>
+		
+			<pattern>SIM</pattern>
+			<template>
+				Inicialmente vamos verificar seu estado geral. Você tem sentido cansaço?
+				<think><set name="topic">CANSACO</set></think>
+			</template>
+		</category>	
+		<category>
+			<pattern>OK</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		<category>
+			<pattern>TUDO BEM</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>		
+		</category>
+		<category>
+		
+			<pattern>NÃO</pattern>
+			<template>
+				Ok obrigada entraremos em contato mais tarde. Até logo!
+			</template>
+		
+		</category>
+		<category>
+   		<pattern>Até logo</pattern>
+			<template>Agradeço pela sua atenção e até logo.</template>
+   	</category>
+			
+   </topic>
+   
+   
+    <topic name="CANSACO">
+		<category>
+		
+			<pattern>MSG</pattern>
+			<template>
+				você tem sentido cansaço?
+			</template>
+		
+		</category>
+		<category>
+		
+			<pattern>MSGPROX</pattern>
+			<template>
+				Certo, o senhor sente dificuldade para comer?
+			</template>
+		
+		</category>		
+		<category>
+			<pattern>SIM</pattern>
+			<template>
+				<srai>MSGPROX</srai>
+				<think>
+				    <set name="cansaco">S</set>
+				    <set name="topic">DIFICULDADECOMER</set>
+				</think>
+			</template>
+		</category>	
+		<category>
+		
+			<pattern>NÃO</pattern>
+			<template>
+				<srai>MSGPROX</srai>
+				<think>
+				    <set name="cansaco">N</set>
+				    <set name="topic">DIFICULDADECOMER</set>
+				</think>
+			</template>
+		
+		</category>
+
+		<category>
+   		<pattern>Até logo</pattern>
+			<template>Agradeço pela sua atenção e até logo.</template>
+   	</category>
+
+		<category>
+		
+			<pattern>*</pattern>
+			<template>
+				Desculpe não entendi. <srai>MSG</srai>
+			</template>
+		
+		</category>
+
+
+			
+    </topic>
+	
+    <topic name="DIFICULDADECOMER">
+		<category>
+		
+			<pattern>MSG</pattern>
+			<template>
+				Dificuldade para comer, você sente?
+			</template>
+		
+		</category>
+		<category>
+		
+			<pattern>MSGPROX</pattern>
+			<template>
+				Certo, e falta de vontade de comer?
+			</template>
+		
+		</category>		
+		<category>
+			<pattern>SIM</pattern>
+			<template>
+				<srai>MSGPROX</srai>
+				<think>
+				    <set name="dificuldadecomer">S</set>
+				    <set name="topic">FALTAVONTADECOMER</set>
+				</think>
+			</template>
+		</category>	
+		<category>
+		
+			<pattern>NÃO</pattern>
+			<template>
+				<srai>MSGPROX</srai>
+				<think>
+				    <set name="dificuldadecomer">N</set>
+				    <set name="topic">FALTAVONTADECOMER</set>
+				</think>
+			</template>
+		
+		</category>
+
+		<category>
+   		<pattern>Até logo</pattern>
+			<template>Agradeço pela sua atenção e até logo.</template>
+   	</category>
+
+		<category>
+		
+			<pattern>*</pattern>
+			<template>
+				Desculpe não entendi. <srai>MSG</srai>
+			</template>
+		
+		</category>
+
+
+			
+    </topic>
+	
+    <topic name="FALTAVONTADECOMER">
+		<category>
+		
+			<pattern>MSG</pattern>
+			<template>
+				Falta de vontade de comer, você sente?
+			</template>
+		
+		</category>
+		<category>
+		
+			<pattern>MSGPROX</pattern>
+			<template>
+				Certo, e tem inchaço nas pernas?
+			</template>
+		
+		</category>		
+		<category>
+			<pattern>SIM</pattern>
+			<template>
+				<srai>MSGPROX</srai>
+				<think>
+				    <set name="faltavontadecomer">S</set>
+				    <set name="topic">INCHACOPERNAS</set>
+				</think>
+			</template>
+		</category>	
+		<category>
+		
+			<pattern>NÃO</pattern>
+			<template>
+				<srai>MSGPROX</srai>
+				<think>
+				    <set name="faltavontadecomer">N</set>
+				    <set name="topic">INCHACOPERNAS</set>
+				</think>
+			</template>
+		
+		</category>
+
+		<category>
+   		<pattern>Até logo</pattern>
+			<template>Agradeço pela sua atenção e até logo.</template>
+   	</category>
+
+		<category>
+		
+			<pattern>*</pattern>
+			<template>
+				Desculpe não entendi. <srai>MSG</srai>
+			</template>
+		
+		</category>
+
+
+			
+    </topic>
+    <topic name="INCHACOPERNAS">
+		<category>
+		
+			<pattern>MSG</pattern>
+			<template>
+				Tem inchaço nas pernas?
+			</template>
+		
+		</category>
+		<category>
+		
+			<pattern>MSGPROX</pattern>
+			<template>
+				Certo, e falta de ar você tem?
+			</template>
+		
+		</category>		
+		<category>
+			<pattern>SIM</pattern>
+			<template>
+				<srai>MSGPROX</srai>
+				<think>
+				    <set name="inchacopernas">S</set>
+				    <set name="topic">FALTADEAR</set>
+				</think>
+			</template>
+		</category>	
+		<category>
+		
+			<pattern>NÃO</pattern>
+			<template>
+				<srai>MSGPROX</srai>
+				<think>
+				    <set name="inchacopernas">N</set>
+				    <set name="topic">FALTADEAR</set>
+				</think>
+			</template>
+		
+		</category>
+
+		<category>
+   		<pattern>Até logo</pattern>
+			<template>Agradeço pela sua atenção e até logo.</template>
+   	</category>
+
+	</topic>
+
+    <topic name="FALTADEAR">
+		<category>
+		
+			<pattern>MSG</pattern>
+			<template>
+				Você tem falta de ar?
+			</template>
+		
+		</category>
+		<category>
+		
+			<pattern>MSGPROX</pattern>
+			<template>
+				SYSTEM cansaco=<get name="cansaco" /> dificuldadecomer=<get name="dificuldadecomer" />  faltavontadecomer=<get name="faltavontadecomer" /> inchacopernas=<get name="inchacopernas" />
+			</template>
+		
+		</category>		
+		<category>
+			<pattern>SIM</pattern>
+			<template>
+				<srai>MSGPROX</srai> faltadear=S
+
+			</template>
+		</category>	
+		<category>
+		
+			<pattern>NÃO</pattern>
+			<template>
+				<srai>MSGPROX</srai>  faltadear=N
+
+			</template>
+		
+		</category>
+
+		<category>
+   		<pattern>Até logo</pattern>
+			<template>Agradeço pela sua atenção e até logo.</template>
+   	</category>
+
+	</topic>
+	
+
+	
+	
+		<category>
+		
+			<pattern>* SIM *</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		
+		</category>
+		<category>
+		
+			<pattern>* SIM</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		
+		</category>
+		
+		<category>
+		
+			<pattern>SIM *</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		
+		</category>
+		
+
+		<category>
+		
+			<pattern>* NÃO *</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		
+		</category>
+		<category>
+		
+			<pattern>* NÃO</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		
+		</category>
+		<category>
+		
+			<pattern>NÃO *</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		
+		</category>
+		
+		<category>
+			<pattern>TENHO</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		<category>
+			<pattern>* TENHO</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+
+~		<category>
+			<pattern>TENHO *</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>NÃO TENHO</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>TENHO NÃO</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+
+		<category>
+			<pattern>TEM</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		<category>
+			<pattern>* TEM</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+
+~		<category>
+			<pattern>TEM *</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>NÃO TEM</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>TEM NÃO</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>TENHO</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		<category>
+			<pattern>* TENHO</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+
+~		<category>
+			<pattern>TENHO *</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>NÃO TENHO</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>TENHO NÃO</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+
+		<category>
+			<pattern>ESTÃO</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		<category>
+			<pattern>* ESTÃO</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+
+~		<category>
+			<pattern>ESTÃO *</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>NÃO ESTÃO</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>ESTÃO NÃO</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+
+
+		
+		<category>
+			<pattern>SINTO</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		<category>
+			<pattern>* SINTO</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+
+~		<category>
+			<pattern>SINTO *</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>NÃO SINTO</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>SINTO NÃO</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+				
+
+		<category>
+			<pattern>FALTA</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		<category>
+			<pattern>* FALTA</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+
+~		<category>
+			<pattern>FALTA *</pattern>
+			<template>
+				<srai>SIM</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>NÃO FALTA</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+		
+		<category>
+			<pattern>FALTA NÃO</pattern>
+			<template>
+				<srai>NÃO</srai>
+			</template>
+		</category>
+		
+	<category>
+   	<pattern>ATÉ LOGO</pattern>
+		<template>Agradeço pela sua atenção e até logo.</template>
+   </category>
+   
+   <category>
+      <pattern>*</pattern>
+      <template>
+			<condition name="numero_erro">
+				<li value="1">Desculpe, não entendi.<think><set name="numero_erro">2</set></think></li>
+				<li value="2">Desculpe, pode repetir?<think><set name="numero_erro">3</set></think></li>
+				<li>Desculpe, pode falar de outra maneira?<think><set name="numero_erro">1</set></think></li>
+			</condition>
+      </template>
+   </category>
+
+   
+   
+ </aiml>
+ 
