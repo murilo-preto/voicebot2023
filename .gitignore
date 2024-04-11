@@ -1,2 +1,5 @@
 __pycache__/
 /python_server/temp
+*.wav
+*.webm
+*.mp3
