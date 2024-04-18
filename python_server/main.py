@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from flask_cors import CORS
-import json
 import base64
+import tempfile
+import os
 
 from public.python.webm2wav import webm2wav
 from public.python.speechToText import recognize_speech
@@ -34,23 +35,34 @@ def upload_audio():
         return 'Nenhum arquivo de áudio enviado', 400
 
     audio_file = request.files['audio']
-    audio_file.save('python_server/temp/audio.webm')
+    text = None
 
-    webm2wav('python_server/temp/audio.webm', 'python_server/temp/audio.wav')
-    text = recognize_speech('python_server/temp/audio.wav')
-    pyttr3_tts(text, 'python_server/temp/responseAudio.mp3')
+    with tempfile.NamedTemporaryFile(suffix='.webm', delete=False) as tmp_webm_audio:
+        temp_webm_audio_path = tmp_webm_audio.name
+        audio_file.save(temp_webm_audio_path)
 
-    with open('python_server/temp/responseAudio.mp3', 'rb') as audio_file:
-        audio_content = audio_file.read()
+        with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp_wav_audio:
+            temp_wav_audio_path = tmp_wav_audio.name
+            webm2wav(temp_webm_audio_path, temp_wav_audio_path)
 
-    audio_base64 = base64.b64encode(audio_content).decode('utf-8')
+            text = recognize_speech(temp_wav_audio_path)
 
-    response_data = {
-        'audio': audio_base64,
-        'text': text
-    }
+    with tempfile.NamedTemporaryFile(suffix='.mp3', delete=False) as tmp_mp3_audio_file:
+        # temp_mp3_audio_path = tmp_mp3_audio_file.name
+        temp_mp3_audio_path = "python_server/temp/resposta.mp3"
+        pyttr3_tts(texto=text, outputPath=temp_mp3_audio_path)
 
-    return jsonify(response_data), 200
+        with open(temp_mp3_audio_path, 'rb') as audio_file:
+            audio_content = audio_file.read()
+
+        audio_base64 = base64.b64encode(audio_content).decode('utf-8')
+
+        response_data = {
+            'audio': audio_base64,
+            'text': text
+        }
+
+        return jsonify(response_data), 200
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000)
