@@ -2,19 +2,19 @@ let mediaRecorder;
 let audioChunks = [];
 
 function base64toBlob(base64, mimeType) {
-    var byteCharacters = atob(base64);
-    var byteNumbers = new Array(byteCharacters.length);
-    for (var i = 0; i < byteCharacters.length; i++) {
+    let byteCharacters = atob(base64);
+    let byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
-    var byteArray = new Uint8Array(byteNumbers);
+    let byteArray = new Uint8Array(byteNumbers);
     return new Blob([byteArray], { type: mimeType });
 }
 
 function playReceivedAudio(audioBase64) {
     console.log("Reproduzindo áudio recebido do servidor");
-    const audioBlob = base64toBlob(audioBase64, 'audio/mp3');
-    const audioElement = new Audio(URL.createObjectURL(audioBlob));
+    let audioBlob = base64toBlob(audioBase64, 'audio/mp3');
+    let audioElement = new Audio(URL.createObjectURL(audioBlob));
     audioElement.play()
         .then(() => console.log("Áudio reproduzido com sucesso"))
         .catch(error => console.error("Erro ao reproduzir áudio:", error));
@@ -22,6 +22,9 @@ function playReceivedAudio(audioBase64) {
 
 function startRecording() {
     console.log("Gravando áudio");
+    // Reinicializar audioChunks para uma matriz vazia
+    audioChunks = [];
+
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
             mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
@@ -30,6 +33,7 @@ function startRecording() {
         })
         .catch(error => console.error('Erro ao acessar o microfone:', error));
 }
+
 
 function stopRecording() {
     console.log("Parando gravação");
@@ -48,9 +52,11 @@ function stopRecording() {
     });
 }
 
+let jumbotronElement; // Declarar a variável fora do escopo da função para que seja acessível em execuções subsequentes
+
 function sendAudioToServer(audioChunks) {
     console.log("Enviando gravação");
-    const formData = new FormData();
+    let formData = new FormData();
     formData.append('audio', new Blob(audioChunks, { type: 'audio/webm' }));
 
     fetch('http://127.0.0.1:5000/api/upload-audio', {
@@ -59,25 +65,32 @@ function sendAudioToServer(audioChunks) {
     })
     .then(response => {
         if (response.ok) {
-            console.log('Áudio enviado com sucesso.');
             audioChunks = [];
+            console.log('Áudio enviado com sucesso.');
 
             response.json().then(data => {
                 console.log(data);
-
-                // Criar um novo elemento h1
-                const newH1Element = document.createElement('h1');
-                newH1Element.textContent = data.text;
                 
-                // Adicionar a classe "jumbotron" ao novo elemento
-                newH1Element.classList.add('jumbotron');
+                // Se jumbotronElement já foi definido, atualizar seu conteúdo; caso contrário, criar um novo elemento
+                if (jumbotronElement) {
+                    // Atualizar o conteúdo do elemento existente
+                    jumbotronElement.textContent = data.text;
+                } else {
+                    // Criar um novo elemento h1
+                    jumbotronElement = document.createElement('h1');
+                    jumbotronElement.textContent = data.text;
+                    jumbotronElement.classList.add('jumbotron');
+                    
+                    // Selecionar o elemento existente para substituição futura
+                    let existingJumbotron = document.getElementById('audioData');
+                    if (existingJumbotron) {
+                        // Substituir o elemento existente pelo novo elemento h1
+                        existingJumbotron.parentNode.replaceChild(jumbotronElement, existingJumbotron);
+                    } else {
+                        console.error("Element 'audioData' not found.");
+                    }
+                }
                 
-                // Selecionar o elemento existente
-                const jumbotronElement = document.getElementById('audioData');
-                
-                // Substituir o elemento existente pelo novo elemento h1
-                jumbotronElement.parentNode.replaceChild(newH1Element, jumbotronElement);
-
                 playReceivedAudio(data.audio);
             });
         } else {
@@ -88,5 +101,6 @@ function sendAudioToServer(audioChunks) {
         console.error('Erro:', error);
     });
 }
+
 
 export { startRecording, stopRecording };

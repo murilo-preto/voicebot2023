@@ -14,12 +14,17 @@ import pyttsx3
 # https://pypi.org/project/pyttsx3/
 
 def pyttr3_tts(texto, outputPath):
-    speaker=pyttsx3.init()
+    try:
+        speaker = pyttsx3.init()
 
-    # Set parameters, rate -> speaking speed
-    speaker.setProperty('voice', 'brazil')
-    rate = speaker.getProperty('rate')
-    speaker.setProperty('rate', rate-50)
+        speaker.setProperty('voice', 'brazil')
+        rate = speaker.getProperty('rate')
+        speaker.setProperty('rate', rate - 50)
 
-    speaker.save_to_file(texto, outputPath)
-    speaker.runAndWait()
+        print(f'Texto a ser convertido: {texto}')
+        print(f'Caminho de saída: {outputPath}')
+
+        speaker.save_to_file(texto, outputPath)
+        speaker.runAndWait()
+    except Exception as e:
+        print(e)
