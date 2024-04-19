@@ -4,7 +4,6 @@ from flask_cors import CORS
 import base64
 import tempfile
 import os
-
 from public.python.webm2wav import webm2wav
 from public.python.speechToText import recognize_speech
 from public.python.textToSpeech import pyttr3_tts
@@ -14,7 +13,6 @@ app.config['JWT_SECRET_KEY'] = '12345'
 jwt = JWTManager(app)
 CORS(app)
 
-# Rota post para lidar com Login
 @app.route('/api/login', methods=['POST'])
 def login():
     if request.form:
@@ -47,22 +45,27 @@ def upload_audio():
 
             text = recognize_speech(temp_wav_audio_path)
 
-    with tempfile.NamedTemporaryFile(suffix='.mp3', delete=False) as tmp_mp3_audio_file:
-        # temp_mp3_audio_path = tmp_mp3_audio_file.name
-        temp_mp3_audio_path = "python_server/temp/resposta.mp3"
-        pyttr3_tts(texto=text, outputPath=temp_mp3_audio_path)
+    temp_file_descriptor, temp_file_name = tempfile.mkstemp(suffix=".mp3")
+    os.close(temp_file_descriptor)
 
-        with open(temp_mp3_audio_path, 'rb') as audio_file:
-            audio_content = audio_file.read()
+    temp_mp3_audio_path = temp_file_name
+    pyttr3_tts(text, temp_mp3_audio_path)
 
-        audio_base64 = base64.b64encode(audio_content).decode('utf-8')
+    with open(temp_mp3_audio_path, 'rb') as mp3_file:
+        audio_content = mp3_file.read()
 
-        response_data = {
-            'audio': audio_base64,
-            'text': text
-        }
+    audio_base64 = base64.b64encode(audio_content).decode('utf-8')
 
-        return jsonify(response_data), 200
+    response_data = {
+        'audio': audio_base64,
+        'text': text
+    }
+
+    os.remove(temp_webm_audio_path)
+    os.remove(temp_wav_audio_path)
+    os.remove(temp_mp3_audio_path)
+
+    return jsonify(response_data), 200
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000)
