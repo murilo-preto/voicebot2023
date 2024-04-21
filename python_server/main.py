@@ -87,5 +87,41 @@ def upload_audio():
 
     return jsonify(response_data), 200
 
+@app.route('/api/chatbot', methods=['POST'])
+def chatbot():
+    token = request.headers['token']
+    username = request.headers['username']
+    if token not in token_dict.keys():
+        token_dict[token]=username
+        print(f'Added token: {token}')
+        print(token_dict)
+    else:
+        print('Token detected in list')
+
+    if request.form:
+        data = request.form.to_dict()
+        text = data["texto"]
+
+        temp_file_descriptor, temp_mp3_audio_path = tempfile.mkstemp(suffix=".mp3")
+        os.close(temp_file_descriptor)
+
+        resposta = None
+
+        pyttr3_tts(resposta, temp_mp3_audio_path)
+
+        with open(temp_mp3_audio_path, 'rb') as mp3_file:
+            audio_content = mp3_file.read()
+
+        audio_base64 = base64.b64encode(audio_content).decode('utf-8')
+
+        response_data = {
+            'audio': audio_base64,
+            'text': resposta
+        }
+
+        os.remove(temp_mp3_audio_path)
+
+        return jsonify(response_data), 200
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000)
