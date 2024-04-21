@@ -3,3 +3,4 @@ __pycache__/
 *.wav
 *.webm
 *.mp3
+/python_server/public/python/__pycache__

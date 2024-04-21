@@ -4,7 +4,7 @@ from flask_cors import CORS
 import base64
 import tempfile
 import os
-from public.python.webm2wav import webm2wav
+from public.python.webm2wav import webm_to_wav_ffmpeg
 from public.python.speechToText import recognize_speech
 from public.python.textToSpeech import pyttr3_tts
 
@@ -41,7 +41,7 @@ def upload_audio():
 
         with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp_wav_audio:
             temp_wav_audio_path = tmp_wav_audio.name
-            webm2wav(temp_webm_audio_path, temp_wav_audio_path)
+            webm_to_wav_ffmpeg(temp_webm_audio_path, temp_wav_audio_path)
 
             text = recognize_speech(temp_wav_audio_path)
 
