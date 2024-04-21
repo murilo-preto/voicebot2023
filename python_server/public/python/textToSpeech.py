@@ -21,8 +21,8 @@ def pyttr3_tts(texto, outputPath):
         rate = speaker.getProperty('rate')
         speaker.setProperty('rate', rate - 50)
 
-        print(f'Texto a ser convertido: {texto}')
-        print(f'Caminho de saída: {outputPath}')
+        print(f'TTS: Texto a ser convertido: {texto}')
+        print(f'TTS: Caminho de saída: {outputPath}')
 
         speaker.save_to_file(texto, outputPath)
         speaker.runAndWait()

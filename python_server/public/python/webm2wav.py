@@ -18,7 +18,7 @@ def webm_to_wav_ffmpeg(input_file, output_file):
         output_stream = ffmpeg.output(input_stream, output_file, **output_options)
 
         # Executa o comando ffmpeg
-        ffmpeg.run(output_stream)
+        ffmpeg.run(output_stream, overwrite_output=True)
 
         print("Conversão concluída com sucesso.")
     except ffmpeg.Error as e:
