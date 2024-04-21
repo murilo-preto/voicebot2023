@@ -4,6 +4,9 @@ from flask_cors import CORS
 import base64
 import tempfile
 import os
+import logging
+
+from public.python.sqlFunctions import *
 from public.python.webm2wav import webm_to_wav_ffmpeg
 from public.python.speechToText import recognize_speech
 from public.python.textToSpeech import pyttr3_tts
@@ -13,24 +16,41 @@ app.config['JWT_SECRET_KEY'] = '12345'
 jwt = JWTManager(app)
 CORS(app)
 
+logging.getLogger("ffmpeg").setLevel(logging.WARNING)
+
 @app.route('/api/login', methods=['POST'])
 def login():
     if request.form:
         data = request.form.to_dict()
-        uname = data["username"]
+        uname_cpf = data["username"]
         psw = data["password"]
-        print(f'{uname}:{psw}')
+        print(f'{uname_cpf}:{psw}')
 
-        if uname!=None:
-            access_token = create_access_token(identity=uname)
+        cpf = re.sub(r'[.-]', '', uname_cpf)
+
+        if validar_login(cpf=cpf, senha=psw)==1:
+            access_token = create_access_token(identity=cpf_para_nome(cpf))
             return jsonify(access_token=access_token), 200
+        else:
+            return jsonify(message='Senha incorreta. Tente novamente.'), 401 
     else:
         return jsonify(message='Empty request form'), 401 
     
+
+token_dict = {}
 @app.route('/api/upload-audio', methods=['POST'])
 def upload_audio():
     if 'audio' not in request.files:
         return 'Nenhum arquivo de áudio enviado', 400
+    
+    token = request.headers['token']
+    username = request.headers['username']
+    if token not in token_dict.keys():
+        token_dict[token]=username
+        print(f'Added token: {token}')
+        print(token_dict)
+    else:
+        print('Token detected in list')
 
     audio_file = request.files['audio']
     text = None

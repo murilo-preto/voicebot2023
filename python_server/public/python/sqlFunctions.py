@@ -85,63 +85,15 @@ def validar_login(cpf, senha):
     except mysql.connector.Error as e:
         return False, f'Erro ao validar login: {e}'
 
+def cpf_para_nome(cpf):
+    try:
+        with mysql.connector.connect(**config) as conn, conn.cursor() as cursor:
+            cursor.execute("SELECT primeiro_nome FROM documento WHERE cpf = %s", (cpf,))
+            nome = cursor.fetchone()
 
-def test_inserir_usuario():
-    data_teste_1 = {
-        'cpf': '12345678900',
-        'primeiro_nome': 'João',
-        'ultimo_nome': 'Silva',
-        'data_nascimento': '1990-01-01',
-        'cargo': 'paciente'
-    }
-
-    data_teste_2= {
-        'cpf': '34567890155',
-        'primeiro_nome': 'Álvaro',
-        'ultimo_nome': 'Torres',
-        'data_nascimento': '1970-09-25',
-        'cargo': 'medico'
-    }
-
-    success, message = inserir_usuario(data_teste_1)
-    print(success, message)
-
-
-def test_inserir_usuario_interativo():
-    print("Teste de inserção de usuários - Modo Interativo\n")
-
-    while True:
-        print("Por favor, insira os dados do novo usuário:")
-        cpf = input("CPF: ")
-        primeiro_nome = input("Primeiro Nome: ")
-        ultimo_nome = input("Último Nome: ")
-        data_nascimento = input("Data de Nascimento (AAAA-MM-DD): ")
-        cargo = input("Cargo: ")
-
-        novo_usuario = {
-            'cpf': cpf,
-            'primeiro_nome': primeiro_nome,
-            'ultimo_nome': ultimo_nome,
-            'data_nascimento': data_nascimento,
-            'cargo': cargo
-        }
-
-        success, message = inserir_usuario(novo_usuario)
-
-        if success:
-            print(f"\nUsuário adicionado com sucesso: {message}\n")
-        else:
-            print(f"\nFalha ao adicionar usuário: {message}\n")
-
-        opcao = input("Deseja inserir outro usuário? (s/n): ")
-        if opcao.lower() != 's':
-            print("Encerrando o teste de inserção de usuários.")
-            break
-
-
-# inserir_cargo('medico')
-# inserir_cargo('paciente')
-# test_inserir_usuario()
-# inserir_login(cpf='34567890155', senha='123')
-# status = validar_login(cpf='34567890155', senha='123')
-# print(status)
+            if nome:
+                return nome[0]
+            else:
+                return False, f"Documento com CPF '{cpf}' não encontrado."
+    except mysql.connector.Error as e:
+        return False, f'Erro ao validar login: {e}'

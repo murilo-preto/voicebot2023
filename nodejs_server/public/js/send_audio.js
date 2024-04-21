@@ -52,16 +52,25 @@ function stopRecording() {
     });
 }
 
-let jumbotronElement; // Declarar a variável fora do escopo da função para que seja acessível em execuções subsequentes
+let jumbotronElement;
 
 function sendAudioToServer(audioChunks) {
     console.log("Enviando gravação");
     let formData = new FormData();
     formData.append('audio', new Blob(audioChunks, { type: 'audio/webm' }));
 
+    const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
+    const username = tokenPayload.sub;
+
+    const headers = {
+        'token': accessToken,
+        'username': username,
+    };
+
     fetch('http://127.0.0.1:5000/api/upload-audio', {
         method: 'POST',
-        body: formData
+        body: formData,
+        headers : headers
     })
     .then(response => {
         if (response.ok) {
@@ -101,6 +110,5 @@ function sendAudioToServer(audioChunks) {
         console.error('Erro:', error);
     });
 }
-
 
 export { startRecording, stopRecording };
