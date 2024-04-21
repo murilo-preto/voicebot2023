@@ -1,3 +1,4 @@
+const accessToken = localStorage.getItem('accessToken');
 let mediaRecorder;
 let audioChunks = [];
 

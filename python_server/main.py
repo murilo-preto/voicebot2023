@@ -10,6 +10,7 @@ from public.python.sqlFunctions import *
 from public.python.webm2wav import webm_to_wav_ffmpeg
 from public.python.speechToText import recognize_speech
 from public.python.textToSpeech import pyttr3_tts
+from public.python.chatbot import chatbot
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = '12345'
@@ -35,9 +36,7 @@ def login():
             return jsonify(message='Senha incorreta. Tente novamente.'), 401 
     else:
         return jsonify(message='Empty request form'), 401 
-    
 
-token_dict = {}
 @app.route('/api/upload-audio', methods=['POST'])
 def upload_audio():
     if 'audio' not in request.files:
@@ -45,12 +44,6 @@ def upload_audio():
     
     token = request.headers['token']
     username = request.headers['username']
-    if token not in token_dict.keys():
-        token_dict[token]=username
-        print(f'Added token: {token}')
-        print(token_dict)
-    else:
-        print('Token detected in list')
 
     audio_file = request.files['audio']
     text = None
@@ -88,15 +81,9 @@ def upload_audio():
     return jsonify(response_data), 200
 
 @app.route('/api/chatbot', methods=['POST'])
-def chatbot():
+def chatbot_route():
     token = request.headers['token']
     username = request.headers['username']
-    if token not in token_dict.keys():
-        token_dict[token]=username
-        print(f'Added token: {token}')
-        print(token_dict)
-    else:
-        print('Token detected in list')
 
     if request.form:
         data = request.form.to_dict()
@@ -105,8 +92,7 @@ def chatbot():
         temp_file_descriptor, temp_mp3_audio_path = tempfile.mkstemp(suffix=".mp3")
         os.close(temp_file_descriptor)
 
-        resposta = None
-
+        resposta = chatbot(token=token, username=username, input_text=text)
         pyttr3_tts(resposta, temp_mp3_audio_path)
 
         with open(temp_mp3_audio_path, 'rb') as mp3_file:
