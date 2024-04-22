@@ -58,11 +58,15 @@ def upload_audio():
 
             text = recognize_speech(temp_wav_audio_path)
 
-    temp_file_descriptor, temp_file_name = tempfile.mkstemp(suffix=".mp3")
+    temp_file_descriptor, temp_mp3_audio_path = tempfile.mkstemp(suffix=".mp3")
     os.close(temp_file_descriptor)
 
-    temp_mp3_audio_path = temp_file_name
-    pyttr3_tts(text, temp_mp3_audio_path)
+    if text == False:
+        resposta = 'Não entendi o que foi dito, repita por favor.'
+    else:
+        resposta = chatbot(token=token, username=username, input_text=text)
+    
+    pyttr3_tts(resposta, temp_mp3_audio_path)
 
     with open(temp_mp3_audio_path, 'rb') as mp3_file:
         audio_content = mp3_file.read()
@@ -71,7 +75,7 @@ def upload_audio():
 
     response_data = {
         'audio': audio_base64,
-        'text': text
+        'text': resposta
     }
 
     os.remove(temp_webm_audio_path)
@@ -88,11 +92,20 @@ def chatbot_route():
     if request.form:
         data = request.form.to_dict()
         text = data["texto"]
+        print(f'{username}: {text}')
 
         temp_file_descriptor, temp_mp3_audio_path = tempfile.mkstemp(suffix=".mp3")
         os.close(temp_file_descriptor)
 
-        resposta = chatbot(token=token, username=username, input_text=text)
+        resposta = None
+        if text!='':
+            temp_file_descriptor, temp_mp3_audio_path = tempfile.mkstemp(suffix=".mp3")
+            os.close(temp_file_descriptor)
+
+            resposta = chatbot(token=token, username=username, input_text=text)
+        else:
+            resposta = 'Não entendi o que foi dito, repita a frase por favor.'
+
         pyttr3_tts(resposta, temp_mp3_audio_path)
 
         with open(temp_mp3_audio_path, 'rb') as mp3_file:
