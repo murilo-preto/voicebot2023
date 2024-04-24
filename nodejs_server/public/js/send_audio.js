@@ -68,7 +68,7 @@ function sendAudioToServer(audioChunks) {
         'username': username,
     };
 
-    fetch('http://voicebot.fernandoteubl.com:5000/api/upload-audio', {
+    fetch('voicebot.fernandoteubl.com:5000/api/upload-audio', {
         method: 'POST',
         body: formData,
         headers : headers
