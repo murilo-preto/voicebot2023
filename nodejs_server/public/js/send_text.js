@@ -33,7 +33,7 @@ function enviarTextoParaServidor(texto) {
     const formData = new FormData();
     formData.append('texto', texto);
 
-    fetch('http://127.0.0.1:5000/api/chatbot', {
+    fetch('http://voicebot.fernandoteubl.com:5000/api/chatbot', {
         method: 'POST',
         body: formData,
         headers: headers
