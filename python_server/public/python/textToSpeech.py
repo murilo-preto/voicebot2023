@@ -19,7 +19,7 @@ def pyttr3_tts(texto, outputPath):
 
         speaker.setProperty('voice', 'brazil')
         rate = speaker.getProperty('rate')
-        speaker.setProperty('rate', rate - 50)
+        speaker.setProperty('rate', rate - 70)
 
         print(f'TTS: Texto a ser convertido: {texto}')
         print(f'TTS: Caminho de saída: {outputPath}')
