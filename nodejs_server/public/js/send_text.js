@@ -62,7 +62,8 @@ function enviarTextoParaServidor(texto) {
                             console.error("Element 'audioData' not found.");
                         }
                     }
-
+                    
+                    // lerTexto(data.text);
                     playReceivedAudio(data.audio);
                 });
             } else {
@@ -73,5 +74,16 @@ function enviarTextoParaServidor(texto) {
             console.error('Erro:', error);
         });
 }
+
+// function lerTexto(texto) { 
+//     // Criar um novo objeto SpeechSynthesisUtterance com o texto
+//     var discurso = new SpeechSynthesisUtterance(texto);
+    
+//     // Usar a voz de síntese de fala padrão
+//     discurso.voice = speechSynthesis.getVoices()[0]; // Você pode alterar a voz aqui
+    
+//     // Falar o texto
+//     speechSynthesis.speak(discurso);
+// }
 
 export { enviarTextoParaServidor };

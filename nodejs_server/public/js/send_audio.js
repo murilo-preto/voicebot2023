@@ -56,7 +56,8 @@ function stopRecording() {
 let jumbotronElement;
 
 function sendAudioToServer(audioChunks) {
-    console.log("Enviando gravação");
+    console.log("Enviando gravação: ", audioChunks);
+    
     let formData = new FormData();
     formData.append('audio', new Blob(audioChunks, { type: 'audio/webm' }));
 
@@ -68,48 +69,48 @@ function sendAudioToServer(audioChunks) {
         'username': username,
     };
 
-    fetch('voicebot.fernandoteubl.com:5000/api/upload-audio', {
+    fetch('http://voicebot.fernandoteubl.com:5000/api/voicebot', {
         method: 'POST',
         body: formData,
-        headers : headers
+        headers: headers
     })
-    .then(response => {
-        if (response.ok) {
-            audioChunks = [];
-            console.log('Áudio enviado com sucesso.');
+        .then(response => {
+            if (response.ok) {
+                audioChunks = [];
+                console.log('Áudio enviado com sucesso.');
 
-            response.json().then(data => {
-                console.log(data);
-                
-                // Se jumbotronElement já foi definido, atualizar seu conteúdo; caso contrário, criar um novo elemento
-                if (jumbotronElement) {
-                    // Atualizar o conteúdo do elemento existente
-                    jumbotronElement.textContent = data.text;
-                } else {
-                    // Criar um novo elemento h1
-                    jumbotronElement = document.createElement('h1');
-                    jumbotronElement.textContent = data.text;
-                    jumbotronElement.classList.add('jumbotron');
-                    
-                    // Selecionar o elemento existente para substituição futura
-                    let existingJumbotron = document.getElementById('audioData');
-                    if (existingJumbotron) {
-                        // Substituir o elemento existente pelo novo elemento h1
-                        existingJumbotron.parentNode.replaceChild(jumbotronElement, existingJumbotron);
+                response.json().then(data => {
+                    console.log(data);
+
+                    // Se jumbotronElement já foi definido, atualizar seu conteúdo; caso contrário, criar um novo elemento
+                    if (jumbotronElement) {
+                        // Atualizar o conteúdo do elemento existente
+                        jumbotronElement.textContent = data.text;
                     } else {
-                        console.error("Element 'audioData' not found.");
+                        // Criar um novo elemento h1
+                        jumbotronElement = document.createElement('h1');
+                        jumbotronElement.textContent = data.text;
+                        jumbotronElement.classList.add('jumbotron');
+
+                        // Selecionar o elemento existente para substituição futura
+                        let existingJumbotron = document.getElementById('audioData');
+                        if (existingJumbotron) {
+                            // Substituir o elemento existente pelo novo elemento h1
+                            existingJumbotron.parentNode.replaceChild(jumbotronElement, existingJumbotron);
+                        } else {
+                            console.error("Element 'audioData' not found.");
+                        }
                     }
-                }
-                
-                playReceivedAudio(data.audio);
-            });
-        } else {
-            console.error('Falha ao enviar áudio.');
-        }
-    })
-    .catch(error => {
-        console.error('Erro:', error);
-    });
+
+                    playReceivedAudio(data.audio);
+                });
+            } else {
+                console.error('Falha ao enviar áudio.');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
 }
 
 export { startRecording, stopRecording };
