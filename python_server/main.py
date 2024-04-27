@@ -37,8 +37,8 @@ def login():
     else:
         return jsonify(message='Empty request form'), 401 
 
-@app.route('/api/upload-audio', methods=['POST'])
-def upload_audio():
+@app.route('/api/voicebot', methods=['POST'])
+def api_voicebot():
     if 'audio' not in request.files:
         return 'Nenhum arquivo de áudio enviado', 400
     

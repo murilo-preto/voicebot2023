@@ -19,7 +19,7 @@ function createContainer(elementType, textContent, classes) {
 function handleLogout() {
     localStorage.removeItem('accessToken');
     console.log('User logged out');
-    window.location.href = '/public/html/login.html';
+    window.location.href = '/login';
 }
 
 function isTokenExpired(token) {
