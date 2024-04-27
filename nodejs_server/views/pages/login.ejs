@@ -15,7 +15,7 @@
         Digite as suas credenciais para acessar as funcionalidades do site:
       </p>
 
-      <form id="login-form" action=http://voicebot.fernandoteubl.com:5000/api/login" method="POST">
+      <form id="login-form" action=http://localhost:5000/api/login" method="POST">
         <div class="container">
           <script>
             function applyCpfMask(input) {
@@ -38,7 +38,7 @@
 
               try {
                 const response = await fetch(
-                  "http://voicebot.fernandoteubl.com:5000/api/login",
+                  "http://localhost:5000/api/login",
                   {
                     method: "POST",
                     headers: {

@@ -27,5 +27,3 @@ def pyttr3_tts(texto, outputPath):
         speaker.runAndWait()
     except Exception as e:
         print(e)
-
-gtts_tts('texto', 'audio.wav')
