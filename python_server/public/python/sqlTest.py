@@ -1,5 +1,5 @@
 import mysql.connector
-from sqlFunctions import inserir_usuario
+from sqlFunctions import inserir_usuario, inserir_login
 
 config = {
     'user': 'root',
@@ -9,7 +9,7 @@ config = {
     'port': '3306'
 }
 
-def test_inserir_usuario():
+def test_inserir_usuario(selector):
     data_teste_1 = {
         'cpf': '12345678900',
         'primeiro_nome': 'João',
@@ -26,7 +26,9 @@ def test_inserir_usuario():
         'cargo': 'medico'
     }
 
-    success, message = inserir_usuario(data_teste_1)
+    usuarios = [data_teste_1, data_teste_2]
+
+    success, message = inserir_usuario(usuarios[selector])
     print(success, message)
 
 
@@ -60,3 +62,6 @@ def test_inserir_usuario_interativo():
         if opcao.lower() != 's':
             print("Encerrando o teste de inserção de usuários.")
             break
+
+# test_inserir_usuario[0]
+inserir_login(cpf='12345678900', senha='12345')

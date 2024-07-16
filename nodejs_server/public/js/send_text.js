@@ -1,6 +1,6 @@
+let jumbotronElement;
 const accessToken = localStorage.getItem('accessToken');
-let mediaRecorder;
-let audioChunks = [];
+
 
 function base64toBlob(base64, mimeType) {
     let byteCharacters = atob(base64);
@@ -21,46 +21,7 @@ function playReceivedAudio(audioBase64) {
         .catch(error => console.error("Erro ao reproduzir áudio:", error));
 }
 
-function startRecording() {
-    console.log("Gravando áudio");
-    // Reinicializar audioChunks para uma matriz vazia
-    audioChunks = [];
-
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-            mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
-            mediaRecorder.start();
-        })
-        .catch(error => console.error('Erro ao acessar o microfone:', error));
-}
-
-
-function stopRecording() {
-    console.log("Parando gravação");
-    mediaRecorder.stop();
-
-    mediaRecorder.addEventListener('stop', () => {
-        // Parar a gravação do microfone
-        if (mediaRecorder.stream) {
-            mediaRecorder.stream.getTracks().forEach(track => {
-                track.stop();
-            });
-        }
-
-        console.log("Gravação finalizada");
-        sendAudioToServer(audioChunks);
-    });
-}
-
-let jumbotronElement;
-
-function sendAudioToServer(audioChunks) {
-    console.log("Enviando gravação: ", audioChunks);
-    
-    let formData = new FormData();
-    formData.append('audio', new Blob(audioChunks, { type: 'audio/webm' }));
-
+function enviarTextoParaServidor(texto) {
     const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
     const username = tokenPayload.sub;
 
@@ -69,16 +30,16 @@ function sendAudioToServer(audioChunks) {
         'username': username,
     };
 
-    fetch('http://localhost:5000/api/voicebot', {
+    const formData = new FormData();
+    formData.append('texto', texto);
+
+    fetch('http://voicebot.fernandoteubl.com:5000/api/chatbot', {
         method: 'POST',
         body: formData,
         headers: headers
     })
         .then(response => {
             if (response.ok) {
-                audioChunks = [];
-                console.log('Áudio enviado com sucesso.');
-
                 response.json().then(data => {
                     console.log(data);
 
@@ -101,11 +62,12 @@ function sendAudioToServer(audioChunks) {
                             console.error("Element 'audioData' not found.");
                         }
                     }
-
+                    
+                    // lerTexto(data.text);
                     playReceivedAudio(data.audio);
                 });
             } else {
-                console.error('Falha ao enviar áudio.');
+                console.error('Falha ao enviar texto.');
             }
         })
         .catch(error => {
@@ -113,4 +75,15 @@ function sendAudioToServer(audioChunks) {
         });
 }
 
-export { startRecording, stopRecording };
+// function lerTexto(texto) { 
+//     // Criar um novo objeto SpeechSynthesisUtterance com o texto
+//     var discurso = new SpeechSynthesisUtterance(texto);
+    
+//     // Usar a voz de síntese de fala padrão
+//     discurso.voice = speechSynthesis.getVoices()[0]; // Você pode alterar a voz aqui
+    
+//     // Falar o texto
+//     speechSynthesis.speak(discurso);
+// }
+
+export { enviarTextoParaServidor };

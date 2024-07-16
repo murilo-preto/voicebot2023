@@ -49,6 +49,10 @@ app.get("/voicebot", authenticateJWT, (req, res) => {
   res.render("pages/voicebot");
 });
 
+app.get("/chatbot", authenticateJWT, (req, res) => {
+  res.render("pages/chatbot");
+});
+
 app.get('/favicon.ico', (req, res) => {
   res.status(204).end();
 });
