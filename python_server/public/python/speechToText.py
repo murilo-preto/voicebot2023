@@ -7,4 +7,5 @@ def recognize_speech(file_path):
             audio = recognizer.record(source)
         return recognizer.recognize_google(audio, language='pt-BR')
     except (sr.UnknownValueError, sr.RequestError) as e:
-        raise ValueError(f"Erro durante o reconhecimento de fala: {e}")
+        print(f"Erro durante o reconhecimento de fala: {e}")
+        return False

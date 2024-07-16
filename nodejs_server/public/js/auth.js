@@ -1,26 +1,3 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const accessToken = localStorage.getItem('accessToken');
-
-    if (accessToken) {
-        const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
-        const username = tokenPayload.sub;
-
-        console.log('User is logged in as:', username);
-
-        const navbar = document.querySelector('.navbar');
-
-        if (navbar) {
-            appendUsernameAndLogoutButton(username, navbar);
-        }
-
-        const voicebotLink = document.querySelector('.voicebot-link');
-        if (voicebotLink) {
-            voicebotLink.addEventListener('click', handleVoicebotLinkClick.bind(null, '/voicebot', accessToken));
-        }
-    } else {
-        console.log('User is not logged in');
-    }
-});
 
 function appendUsernameAndLogoutButton(username, navbar) {
     const usernameContainer = createContainer('span', `Bem vindo, ${username}`, ['navbar-text', 'mr-2']);
@@ -45,7 +22,41 @@ function handleLogout() {
     window.location.href = '/login';
 }
 
-function handleVoicebotLinkClick(url, accessToken, event) {
+function isTokenExpired(token) {
+    // Decode the token to access its claims
+    const decodedToken = decodeToken(token);
+
+    // Check if the "exp" claim exists
+    if (decodedToken && decodedToken.exp) {
+        // Get the expiration time from the token
+        const expirationTime = decodedToken.exp * 1000; // Convert to milliseconds
+
+        // Get the current time
+        const currentTime = new Date().getTime();
+
+        // Compare the current time with the expiration time
+        return currentTime > expirationTime;
+    }
+
+    // If the "exp" claim is not present, consider the token as expired
+    return true;
+}
+
+function decodeToken(token) {
+    try {
+        // Decode the token using a library or the built-in window.atob() function
+        // Note: Using a library like jwt-decode is recommended for proper decoding
+        const decodedPayload = JSON.parse(window.atob(token.split('.')[1]));
+
+        return decodedPayload;
+    } catch (error) {
+        // Handle decoding errors
+        console.error('Error decoding JWT:', error);
+        return null;
+    }
+}
+
+function handleNavbarLinkClick(event, accessToken, url) {
     event.preventDefault();
     const headers = {
         'Authorization': `Bearer ${accessToken}`,
@@ -63,3 +74,40 @@ function handleVoicebotLinkClick(url, accessToken, event) {
         })
         .catch(error => console.error('Error:', error));
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const accessToken = localStorage.getItem('accessToken');
+
+    if (accessToken) {
+        const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
+        const username = tokenPayload.sub;
+
+        const isExpired = isTokenExpired(accessToken);
+
+        if (isExpired) {
+            console.log('The token is expired.');
+            alert("Seu Token de acesso está expirado, por segurança, faça o login novamente.")
+            localStorage.removeItem('accessToken');
+            window.location.href = '/login';
+        } else {
+            console.log('The token is still valid.');
+        }
+
+        console.log('User is logged in as:', username);
+
+        const navbarLinks = document.querySelectorAll('.navbar-nav .nav-link');
+
+        navbarLinks.forEach(link => {
+            link.addEventListener('click', function (event) {
+                handleNavbarLinkClick(event, accessToken, link.getAttribute('href'));
+            });
+        });
+
+        const navbar = document.querySelector('.navbar');
+        if (navbar) {
+            appendUsernameAndLogoutButton(username, navbar);
+        }
+    } else {
+        console.log('User is not logged in');
+    }
+})
