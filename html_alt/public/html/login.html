@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Agente conversacional para telemonitoramento de pacientes</title>
+
+    <!-- CSS (load bootstrap from a CDN) -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            padding-top: 50px;
+        }
+    </style>
+</head>
+
+<body class="container">
+    <header>
+        <!-- HTML file -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="/">Navegação</a>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/public/html/login.html">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link voicebot-link" href="/public/html/voicebot.html">Voicebot</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/public/html/chatbot.html">Chatbot</a>
+                </li>
+            </ul>
+        </nav>
+
+        <script src="/public/js/auth.js"></script>
+    </header>
+
+    <main>
+        <div class="jumbotron">
+            <h1>Login</h1>
+            <p>
+                Digite as suas credenciais para acessar as funcionalidades do site:
+            </p>
+
+            <form id="login-form" action="https://murilopreto.pythonanywhere.com/api/login" method="POST">
+                <div class="container">
+                    <script>
+                        function applyCpfMask(input) {
+                            var value = input.value;
+
+                            if (isNaN(value[value.length - 1])) {
+                                input.value = value.substring(0, value.length - 1);
+                                return;
+                            }
+
+                            input.setAttribute("maxlength", "14");
+                            if (value.length === 3 || value.length === 7)
+                                input.value += ".";
+                            if (value.length === 11) input.value += "-";
+                        }
+
+                        async function submitForm() {
+                            const form = document.getElementById("login-form");
+                            const formData = new URLSearchParams(new FormData(form));
+
+                            try {
+                                const response = await fetch(
+                                    "https://murilopreto.pythonanywhere.com/api/login",
+                                    {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/x-www-form-urlencoded",
+                                        },
+                                        body: formData,
+                                        mode: 'cors'
+                                    }
+                                );
+
+                                if (!response.ok) {
+                                    throw new Error("Authentication failed");
+                                }
+
+                                const data = await response.json();
+                                const accessToken = data.access_token;
+                                console.log("Received JWT token:", accessToken);
+
+                                // Store the JWT token in localStorage or cookies as needed
+                                localStorage.setItem("accessToken", accessToken);
+
+                                window.location.href = "/";
+                            } catch (error) {
+                                console.error("Error:", error.message);
+                            }
+                        }
+                    </script>
+
+                    <label for="username"><b>CPF:</b></label>
+                    <input oninput="applyCpfMask(this)" type="text" id="username" placeholder="xxx.xxx.xxx-xx"
+                        name="username" autocomplete="username" required />
+
+                    <br />
+
+                    <label for="password"><b>Senha:</b></label>
+                    <input type="password" id="password" placeholder="Digite a sua senha" name="password"
+                        pattern=".{8,}" autocomplete="current-password" required />
+
+                    <br />
+
+                    <button type="button" onclick="submitForm()">Login</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p class="text-center text-muted">&copy; Copyright 2023 TBD</p>
+    </footer>
+</body>
+
+</html>

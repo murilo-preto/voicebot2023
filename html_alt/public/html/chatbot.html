@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Agente conversacional para telemonitoramento de pacientes</title>
+
+    <!-- CSS (load bootstrap from a CDN) -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            padding-top: 50px;
+        }
+    </style>
+</head>
+
+<body class="container">
+    <header>
+        <!-- HTML file -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="/">Navegação</a>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/public/html/login.html">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link voicebot-link" href="/public/html/voicebot.html">Voicebot</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/public/html/chatbot.html">Chatbot</a>
+                </li>
+            </ul>
+        </nav>
+
+        <script src="/public/js/auth.js"></script>
+    </header>
+
+    <main>
+        <div id="audioData" class="jumbotron">
+            <h1>Chatbot</h1>
+        </div>
+
+        <h2>Envio de Texto para Servidor</h2>
+
+        <form id="textForm">
+            <label for="textInput">Digite o texto:</label>
+            <input type="text" id="textInput" name="textInput">
+            <button type="submit">Enviar</button>
+        </form>
+
+        <script type="module">
+            import { enviarTextoParaServidor } from '/public/js/sendtext.js';
+            document.getElementById('textForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                var texto = document.getElementById('textInput').value;
+                enviarTextoParaServidor(texto);
+            });
+        </script>
+
+    </main>
+
+    <footer>
+        <p class="text-center text-muted">&copy; Copyright 2023 TBD</p>
+    </footer>
+</body>
+
+</html>

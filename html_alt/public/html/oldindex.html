@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Agente conversacional para telemonitoramento de pacientes</title>
+
+    <!-- CSS (load bootstrap from a CDN) -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            padding-top: 50px;
+        }
+    </style>
+</head>
+
+<body class="container">
+    <header>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const accessToken = localStorage.getItem('accessToken');
+
+                if (accessToken) {
+                    const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
+                    const username = tokenPayload.sub;
+
+                    console.log('User is logged in as:', username);
+
+                    const navbarLinks = document.querySelectorAll('.navbar-nav .nav-link');
+
+                    navbarLinks.forEach(link => {
+                        link.addEventListener('click', function (event) {
+                            handleNavbarLinkClick(event, accessToken, link.getAttribute('href'));
+                        });
+                    });
+
+                    const navbar = document.querySelector('.navbar');
+                    if (navbar) {
+                        appendUsernameAndLogoutButton(username, navbar);
+                    }
+                } else {
+                    console.log('User is not logged in');
+                }
+            });
+
+            function appendUsernameAndLogoutButton(username, navbar) {
+                const usernameContainer = createContainer('span', `Bem vindo, ${username}`, ['navbar-text', 'mr-2']);
+                const logoutButton = createContainer('button', 'Desconectar', ['btn', 'btn-outline-secondary']);
+
+                logoutButton.addEventListener('click', handleLogout);
+
+                navbar.appendChild(usernameContainer);
+                navbar.appendChild(logoutButton);
+            }
+
+            function createContainer(elementType, textContent, classes) {
+                const container = document.createElement(elementType);
+                container.textContent = textContent;
+                container.classList.add(...classes);
+                return container;
+            }
+
+            function handleLogout() {
+                localStorage.removeItem('accessToken');
+                console.log('User logged out');
+                window.location.href = '/login';
+            }
+
+            function handleNavbarLinkClick(event, accessToken, url) {
+                event.preventDefault();
+                const headers = {
+                    'Authorization': `Bearer ${accessToken}`,
+                };
+                fetch(url, { method: 'GET', headers: headers })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        document.write(html);
+                        document.close();
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+
+        </script>
+    </header>
+
+    <main>
+        <div class="jumbotron">
+            <h1>Login</h1>
+            <p>
+                Digite as suas credenciais para acessar as funcionalidades do site:
+            </p>
+
+            <form id="login-form" action=http://voicebot.fernandoteubl.com:5000/api/login" method="POST">
+                <div class="container">
+                    <script>
+                        function applyCpfMask(input) {
+                            var value = input.value;
+
+                            if (isNaN(value[value.length - 1])) {
+                                input.value = value.substring(0, value.length - 1);
+                                return;
+                            }
+
+                            input.setAttribute("maxlength", "14");
+                            if (value.length === 3 || value.length === 7)
+                                input.value += ".";
+                            if (value.length === 11) input.value += "-";
+                        }
+
+                        async function submitForm() {
+                            const form = document.getElementById("login-form");
+                            const formData = new URLSearchParams(new FormData(form));
+
+                            try {
+                                const response = await fetch(
+                                    "http://voicebot.fernandoteubl.com:5000/api/login",
+                                    {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/x-www-form-urlencoded",
+                                        },
+                                        body: formData,
+                                        mode: 'cors'
+                                    }
+                                );
+
+                                if (!response.ok) {
+                                    throw new Error("Authentication failed");
+                                }
+
+                                const data = await response.json();
+                                const accessToken = data.access_token;
+                                console.log("Received JWT token:", accessToken);
+
+                                // Store the JWT token in localStorage or cookies as needed
+                                localStorage.setItem("accessToken", accessToken);
+
+                                window.location.href = "/";
+                            } catch (error) {
+                                console.error("Error:", error.message);
+                            }
+                        }
+                    </script>
+
+                    <label for="username"><b>CPF:</b></label>
+                    <input oninput="applyCpfMask(this)" type="text" id="username" placeholder="xxx.xxx.xxx-xx"
+                        name="username" required />
+
+                    <br />
+
+                    <label for="password"><b>Senha:</b></label>
+                    <input type="password" id="password" placeholder="Digite a sua senha" name="password"
+                        pattern=".{8,}" required />
+
+                    <br />
+
+                    <button type="button" onclick="submitForm()">Login</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="audioData" class="jumbotron">
+            <h1>Chatbot</h1>
+        </div>
+
+        <h2>Envio de Texto para Servidor</h2>
+
+        <form id="textForm">
+            <label for="textInput">Digite o texto:</label>
+            <input type="text" id="textInput" name="textInput">
+            <button type="submit">Enviar</button>
+        </form>
+
+        <button id="startRecording">Iniciar Gravação</button>
+        <button id="stopRecording">Parar Gravação</button>
+
+        <script>
+
+            let jumbotronElement;
+            let mediaRecorder;
+            const accessToken = localStorage.getItem('accessToken');
+
+
+            function base64toBlob(base64, mimeType) {
+                let byteCharacters = atob(base64);
+                let byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                let byteArray = new Uint8Array(byteNumbers);
+                return new Blob([byteArray], { type: mimeType });
+            }
+
+            function playReceivedAudio(audioBase64) {
+                console.log("Reproduzindo áudio recebido do servidor");
+                let audioBlob = base64toBlob(audioBase64, 'audio/mp3');
+                let audioElement = new Audio(URL.createObjectURL(audioBlob));
+                audioElement.play()
+                    .then(() => console.log("Áudio reproduzido com sucesso"))
+                    .catch(error => console.error("Erro ao reproduzir áudio:", error));
+            }
+
+            function enviarTextoParaServidor(texto) {
+                const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
+                const username = tokenPayload.sub;
+
+                const headers = {
+                    'token': accessToken,
+                    'username': username,
+                };
+
+                const formData = new FormData();
+                formData.append('texto', texto);
+
+                fetch('http://voicebot.fernandoteubl.com:5000/api/chatbot', {
+                    method: 'POST',
+                    body: formData,
+                    headers: headers
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            response.json().then(data => {
+                                console.log(data);
+
+                                // Se jumbotronElement já foi definido, atualizar seu conteúdo; caso contrário, criar um novo elemento
+                                if (jumbotronElement) {
+                                    // Atualizar o conteúdo do elemento existente
+                                    jumbotronElement.textContent = data.text;
+                                } else {
+                                    // Criar um novo elemento h1
+                                    jumbotronElement = document.createElement('h1');
+                                    jumbotronElement.textContent = data.text;
+                                    jumbotronElement.classList.add('jumbotron');
+
+                                    // Selecionar o elemento existente para substituição futura
+                                    let existingJumbotron = document.getElementById('audioData');
+                                    if (existingJumbotron) {
+                                        // Substituir o elemento existente pelo novo elemento h1
+                                        existingJumbotron.parentNode.replaceChild(jumbotronElement, existingJumbotron);
+                                    } else {
+                                        console.error("Element 'audioData' not found.");
+                                    }
+                                }
+
+                                lerTexto(data.text);
+                                playReceivedAudio(data.audio);
+                            });
+                        } else {
+                            console.error('Falha ao enviar texto.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                    });
+            }
+
+            function lerTexto(texto) {
+                var discurso = new SpeechSynthesisUtterance(texto);
+
+                // Definir o idioma como português do Brasil
+                discurso.lang = 'pt-BR';
+
+                // Usar uma voz em português do Brasil (se disponível)
+                var vozes = speechSynthesis.getVoices();
+                for (var i = 0; i < vozes.length; i++) {
+                    if (vozes[i].lang === 'pt-BR') {
+                        discurso.voice = vozes[i];
+                        break;
+                    }
+                }
+
+                // Falar o texto
+                speechSynthesis.speak(discurso);
+            }
+
+            document.getElementById('textForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Evita que o formulário seja submetido normalmente
+
+                var texto = document.getElementById('textInput').value;
+                enviarTextoParaServidor(texto);
+            });
+
+            let audioChunks = [];
+
+            function startRecording() {
+                console.log("Gravando áudio");
+                // Reinicializar audioChunks para uma matriz vazia
+                audioChunks = [];
+
+                console.log(navigator);
+
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                        mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                        mediaRecorder.start();
+                    })
+                    .catch(error => console.error('Erro ao acessar o microfone:', error));
+            }
+
+
+            function stopRecording() {
+                console.log("Parando gravação");
+                mediaRecorder.stop();
+
+                mediaRecorder.addEventListener('stop', () => {
+                    // Parar a gravação do microfone
+                    if (mediaRecorder.stream) {
+                        mediaRecorder.stream.getTracks().forEach(track => {
+                            track.stop();
+                        });
+                    }
+
+                    console.log("Gravação finalizada");
+                    sendAudioToServer(audioChunks);
+                });
+            }
+
+            function sendAudioToServer(audioChunks) {
+                console.log("Enviando gravação");
+                let formData = new FormData();
+                formData.append('audio', new Blob(audioChunks, { type: 'audio/webm' }));
+
+                const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
+                const username = tokenPayload.sub;
+
+                const headers = {
+                    'token': accessToken,
+                    'username': username,
+                };
+
+                fetch('http://voicebot.fernandoteubl.com:5000/api/upload-audio', {
+                    method: 'POST',
+                    body: formData,
+                    headers: headers
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            audioChunks = [];
+                            console.log('Áudio enviado com sucesso.');
+
+                            response.json().then(data => {
+                                console.log(data);
+
+                                // Se jumbotronElement já foi definido, atualizar seu conteúdo; caso contrário, criar um novo elemento
+                                if (jumbotronElement) {
+                                    // Atualizar o conteúdo do elemento existente
+                                    jumbotronElement.textContent = data.text;
+                                } else {
+                                    // Criar um novo elemento h1
+                                    jumbotronElement = document.createElement('h1');
+                                    jumbotronElement.textContent = data.text;
+                                    jumbotronElement.classList.add('jumbotron');
+
+                                    // Selecionar o elemento existente para substituição futura
+                                    let existingJumbotron = document.getElementById('audioData');
+                                    if (existingJumbotron) {
+                                        // Substituir o elemento existente pelo novo elemento h1
+                                        existingJumbotron.parentNode.replaceChild(jumbotronElement, existingJumbotron);
+                                    } else {
+                                        console.error("Element 'audioData' not found.");
+                                    }
+                                }
+
+                                playReceivedAudio(data.audio);
+                            });
+                        } else {
+                            console.error('Falha ao enviar áudio.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                    });
+            }
+
+            document.getElementById('startRecording').addEventListener('click', startRecording);
+            document.getElementById('stopRecording').addEventListener('click', stopRecording);
+
+
+
+        </script>
+
+
+
+
+    </main>
+
+    <footer>
+        <p class="text-center text-muted">&copy; Copyright 2023 TBD</p>
+    </footer>
+</body>
+
+</html>
