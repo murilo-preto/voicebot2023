@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Agente conversacional para telemonitoramento de pacientes</title>
+
+    <!-- CSS (load bootstrap from a CDN) -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            padding-top: 50px;
+        }
+    </style>
+</head>
+
+<body class="container">
+    <header>
+        <!-- HTML file -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="/">Navegação</a>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/public/html/login.html">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link voicebot-link" href="/public/html/voicebot.html">Voicebot</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/public/html/chatbot.html">Chatbot</a>
+                </li>
+            </ul>
+        </nav>
+
+        <script src="/public/js/auth.js"></script>
+    </header>
+
+    <main>
+        <div id="audioData" class="jumbotron">
+            <h1>Agente conversacional para telemonitoramento de pacientes</h1>
+        </div>
+
+        <button id="startRecording">Iniciar Gravação</button>
+        <button id="stopRecording">Parar Gravação</button>
+
+        <script type="module">
+            import { startRecording, stopRecording } from '/public/js/sendaudio.js';
+            // Event listeners dos botões
+            document.getElementById('startRecording').addEventListener('click', startRecording);
+            document.getElementById('stopRecording').addEventListener('click', stopRecording);
+        </script>
+    </main>
+
+    <footer>
+        <p class="text-center text-muted">&copy; Copyright 2023 TBD</p>
+    </footer>
+</body>
+
+</html>
