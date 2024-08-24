@@ -1,0 +1,93 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #ececec;
+    padding-top: 30px;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #343a40;
+    padding-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #324960;
+    padding-top: 5px;
+    padding-bottom: 0px;
+}
+
+p {
+    font-size: 1rem;
+    font-weight: 0;
+    color: #1e1e1e;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.jumbotron {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.button {
+    background-color: #343a40;
+    color: rgb(255, 255, 255);
+    border: none;
+    padding: 3px 7px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #495159;
+}
+
+#startRecording {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#startRecording:hover {
+    background-color: #0056b3;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    /* Ajuste conforme necessário */
+}
+
+footer {
+    margin-top: 50px;
+    padding: 20px 0;
+    background-color: transparent !important;
+}
+
+footer p {
+    margin: 0;
+}
+
+.navbar {
+    background-color: transparent !important;
+}
+
+.center-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    /* Ajuste conforme necessário */
+}

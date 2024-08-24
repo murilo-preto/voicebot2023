@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function () {
     const accessToken = localStorage.getItem('accessToken');
 
@@ -8,23 +7,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
         console.log('User is logged in as:', username);
 
-        const navbar = document.querySelector('.navbar');
-        if (navbar) {
-            appendUsernameAndLogoutButton(username, navbar);
+        const userContainer = document.querySelector('#user-container');
+        if (userContainer) {
+            appendUsernameAndLogoutButton(username, userContainer);
         }
     } else {
         console.log('User is not logged in');
     }
 });
 
-function appendUsernameAndLogoutButton(username, navbar) {
-    const usernameContainer = createContainer('span', `Bem vindo, ${username}`, ['navbar-text', 'mr-2']);
+function appendUsernameAndLogoutButton(username, container) {
+    const usernameContainer = createContainer('span', `Bem-vindo, ${username}`, ['navbar-text', 'mr-3']);
     const logoutButton = createContainer('button', 'Desconectar', ['btn', 'btn-outline-secondary']);
 
     logoutButton.addEventListener('click', handleLogout);
 
-    navbar.appendChild(usernameContainer);
-    navbar.appendChild(logoutButton);
+    container.appendChild(usernameContainer);
+    container.appendChild(logoutButton);
 }
 
 function createContainer(elementType, textContent, classes) {

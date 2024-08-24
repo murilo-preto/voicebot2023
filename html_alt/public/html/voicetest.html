@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reconhecimento de Voz</title>
+</head>
+
+<body>
+    <h1>Reconhecimento de Voz para Texto</h1>
+    <button id="start-button">Começar a falar</button>
+    <p id="output">O que você falar aparecerá aqui...</p>
+
+    <script type="module">
+        import { voiceRecognition } from '/public/js/voiceRecognition.js';
+
+        document.getElementById("start-button").onclick = function () {
+            voiceRecognition(function (resultado) {
+                document.getElementById("output").innerText = resultado;
+            });
+        };
+    </script>
+</body>
+
+</html>
