@@ -1,11 +1,8 @@
-"""
-Alteração no Kernel.py do import aiml: time.clock -> time.time
-"""
 
 import aiml
 from datetime import datetime
 
-path_xml = r'C:\Users\user\Documents\GitHub\voicebot2023\python_server\public\python\voicebot2.xml'
+path_xml = r'/home/murilopreto/mysite/public/python/voicebot2.xml'
 
 def chatbot_maria_helena(nome):
     ai = aiml.Kernel()
@@ -56,4 +53,5 @@ def chatbot(token, username, input_text):
             print(e)
             return "Desculpe, ocorreu um erro"
 
+    print("Resposta:", response)
     return response
