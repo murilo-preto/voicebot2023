@@ -1,13 +1,19 @@
 import mysql.connector
 import re
+import bcrypt
 
 config = {
-    'user': 'root',
-    'password': 'password',
-    'host': 'localhost',
-    'database': 'voicebot',
-    'port': '3306'
+    'user': 'murilopreto',
+    'password': 'mysql31415@',
+    'host': 'murilopreto.mysql.pythonanywhere-services.com',
+    'database': 'murilopreto$voicebot'
 }
+
+def gen_hash_password(salt, senha):
+    senha = senha.encode('utf-8')
+
+    hash_senha = bcrypt.hashpw(senha, salt)
+    return hash_senha
 
 
 def filtrar_entrada(entrada):
@@ -55,9 +61,9 @@ def inserir_usuario(data):
                 return False, f"Cargo '{data['cargo']}' não encontrado na tabela 'cargo'."
     except (mysql.connector.Error, KeyError) as e:
         return False, f'Erro: {e}'
-    
 
-def inserir_login(cpf, senha):
+
+def inserir_login_nativo(cpf, senha):
     try:
         with mysql.connector.connect(**config) as conn, conn.cursor() as cursor:
             cursor.callproc('inserir_login', (cpf, senha))
@@ -68,8 +74,32 @@ def inserir_login(cpf, senha):
     except mysql.connector.Error as e:
         print(f'Erro ao inserir login: {e}')
 
-    
-def validar_login(cpf, senha):
+def inserir_login_server_hash(cpf, senha):
+    try:
+        with mysql.connector.connect(**config) as conn, conn.cursor() as cursor:
+            cursor.execute("SELECT id FROM documento WHERE cpf = %s", (cpf,))
+            user_id = cursor.fetchone()
+
+            if user_id:
+                user_id = user_id[0]
+                sql = "INSERT INTO login (id_documento, salt, hash_senha) VALUES (%s, %s, %s)"
+
+                salt = bcrypt.gensalt()
+                hash_senha = gen_hash_password(salt, senha)
+
+                print(f"Senha {senha} ; Salt {salt} ; Hash {hash_senha}")
+
+                val = (user_id, salt, hash_senha)
+                cursor.execute(sql, val)
+                conn.commit()
+                return True, 'Usuário adicionado com sucesso!'
+            else:
+                return False, f"Erro: Não foi possível encontrar o user_id."
+    except (mysql.connector.Error, KeyError) as e:
+        return False, f'Erro: {e}'
+
+
+def validar_login_nativo(cpf, senha):
     try:
         with mysql.connector.connect(**config) as conn, conn.cursor() as cursor:
             cursor.execute("SELECT id FROM documento WHERE cpf = %s", (cpf,))
@@ -82,6 +112,31 @@ def validar_login(cpf, senha):
                 return resultado
             else:
                 return False, f"Documento com CPF '{cpf}' não encontrado."
+    except mysql.connector.Error as e:
+        return False, f'Erro ao validar login: {e}'
+
+def validar_login_server_hash(cpf, senha):
+    try:
+        with mysql.connector.connect(**config) as conn, conn.cursor() as cursor:
+            cursor.execute("SELECT id FROM documento WHERE cpf = %s", (cpf,))
+            id_documento = cursor.fetchone()
+
+            if id_documento:
+                function_call = "SELECT salt FROM login WHERE id_documento = %s"
+                cursor.execute(function_call, id_documento)
+                salt = cursor.fetchone()[0]
+
+                function_call = "SELECT hash_senha FROM login WHERE id_documento = %s"
+                cursor.execute(function_call, id_documento)
+                hash_senha_db = cursor.fetchone()[0]
+
+                hash_senha = gen_hash_password(salt=salt, senha=senha)
+
+                if (hash_senha==hash_senha_db):
+                    return True, "Senha validada com sucesso"
+
+            return False, "Erro ao validar senha"
+
     except mysql.connector.Error as e:
         return False, f'Erro ao validar login: {e}'
 
