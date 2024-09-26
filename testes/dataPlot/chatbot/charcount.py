@@ -10,10 +10,10 @@ df = pd.read_csv(csv_path)
 df['caracteres'] = df['texto'].apply(len)
 
 # Definindo um estilo mais elegante para o gráfico
-sns.set(style="whitegrid")
+# sns.set(style="whitegrid")
 
 # Criando o gráfico de regressão com um tamanho maior e cores aprimoradas
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(14, 8))
 
 # Plotando os pontos (scatter) e a linha de regressão
 sns.regplot(x='Tempo_execucao', y='caracteres', data=df, 
@@ -21,16 +21,17 @@ sns.regplot(x='Tempo_execucao', y='caracteres', data=df,
             line_kws={'color': 'red', 'linewidth': 2, 'label': 'Curva de Regressão'})
 
 # Adicionando título e rótulos personalizados
-plt.title('Relação entre Tempo de Execução e Número de Caracteres (Regressão)', fontsize=16)
-plt.xlabel('Tempo de Execução (s)', fontsize=12)
-plt.ylabel('Número de Caracteres', fontsize=12)
+plt.title('Relação entre Tempo de Resposta e Número de Caracteres', fontsize=22)
+plt.xlabel('Tempo de resposta (s)', fontsize=16)
+plt.ylabel('Número de Caracteres', fontsize=16)
+plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 
 # Adicionando a legenda ao gráfico
-plt.legend()
+plt.legend(fontsize=12)
 
 # Ajustando os ticks dos eixos para torná-los mais legíveis
-plt.xticks(fontsize=10)
-plt.yticks(fontsize=10)
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
 
 # Exibindo o gráfico final
 plt.show()
